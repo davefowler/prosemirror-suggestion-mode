@@ -1,11 +1,12 @@
 import { Plugin, PluginKey } from "prosemirror-state"
-import { Decoration, DecorationSet } from "prosemirror-view"
 import { ChangesetTracker } from "./changesetTracker"
+import { ChangesetDecorator } from "./changesetDecorator"
 
 export const suggestionsPluginKey = new PluginKey("suggestions")
 
-// Create changeset tracker instance
+// Create instances
 const tracker = new ChangesetTracker()
+const decorator = new ChangesetDecorator()
 
 // Create the suggestions plugin
 // Default tooltip renderer that can be overridden
@@ -100,8 +101,11 @@ export const suggestionsPlugin = new Plugin({
             return {
                 suggestionMode: true,
                 username: 'Anonymous',
-                activeMarkRange: null, // Will store {from, to, createdAt}
-                showDeletedText: true // New setting to control deletion display
+                showDeletedText: true,
+                metadata: {
+                    user: 'Anonymous',
+                    timestamp: Date.now()
+                }
             }
         },
         
