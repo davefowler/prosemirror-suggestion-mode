@@ -6,7 +6,7 @@ import { addListNodes } from "prosemirror-schema-list"
 import { baseKeymap } from "prosemirror-commands"
 import { keymap } from "prosemirror-keymap"
 import { history } from "prosemirror-history"
-import { suggestionsPlugin, suggestionsPluginKey } from "./suggestions"
+import { suggestionsPlugin, suggestionsPluginKey } from "./suggestions.js"
 
 const mySchema = schema
 
