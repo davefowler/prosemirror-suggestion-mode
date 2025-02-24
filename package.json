@@ -10,7 +10,8 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules --experimental-import-meta-resolve' jest --watch",
     "start": "webpack serve --mode development",
     "build": "tsc && webpack --mode production",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "prebuild": "tsc"
   },
   "dependencies": {
     "prosemirror-changeset": "^2.2.1",
