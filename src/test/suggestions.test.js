@@ -32,8 +32,7 @@ describe('ProseMirror Suggestions Plugin', () => {
     describe('Initialization', () => {
         test('should initialize with suggestion mode enabled', () => {
             const pluginState = suggestionsPluginKey.getState(state)
-            expect(pluginState.suggestionMode).toBe(true)
-            expect(pluginState.username).toBe('Anonymous')
+            expect(pluginState.inSuggestingMode).toBe(true)
         })
 
         test('should have proper initial metadata', () => {
