@@ -44,11 +44,13 @@ export class ChangesetTracker {
       timestamp: Date.now()
     }
     
-    // Create a new changeset with the metadata
-    const newChangeset = new ChangeSet(change.changes, metadata)
-    this.changeset = this.changeset ? this.changeset.compose(newChangeset) : newChangeset
+    // Add metadata to the change
+    change.setMeta(metadata)
     
-    return newChangeset
+    // Update the changeset
+    this.changeset = change
+    
+    return change
   }
 
   // Get all changes in the current session
