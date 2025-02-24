@@ -65,21 +65,21 @@ export const suggestionsPlugin = new Plugin({
     },
 
     state: {
-        init(_, { doc, suggestions = { suggestionMode: false, showDeletedText: false, metaData: { user: 'Anonymous', timestamp: Date.now() } } }) {
+        init(_, { doc }) {
             return {
                 changeSet: ChangeSet.create(doc),
-                suggestionMode: suggestions.suggestionMode,
-                showDeletedText: suggestions.showDeletedText,
-                metadata: suggestions.metaData
+                inSuggestingMode: false, // Default value
+                showDeletedText: true,  // Default value
+                metadata: { user: 'Anonymous', timestamp: Date.now() } // Default metadata
             }
         },
         
         apply(tr, value, oldState, newState) {
             const meta = tr.getMeta(suggestionsPlugin);
             const showDeletedText = meta && meta.showDeletedText !== undefined ? meta.showDeletedText : value.showDeletedText;
-            const suggestionMode = meta && meta.suggestionMode !== undefined ? meta.suggestionMode : value.suggestionMode;
+            const inSuggestingMode = meta && meta.inSuggestingMode !== undefined ? meta.inSuggestingMode : value.inSuggestingMode;
 
-            if (!tr.docChanged || !suggestionMode) return { ...value, showDeletedText, suggestionMode };
+            if (!tr.docChanged || !inSuggestingMode) return { ...value, showDeletedText, inSuggestingMode: inSuggestingMode };
 
             const stepMaps = tr.steps.map(step => step.getMap());
             const data = { user: value.username, timestamp: Date.now() };
@@ -94,7 +94,7 @@ export const suggestionsPlugin = new Plugin({
                 ...value,
                 changeSet: updatedChangeSet,
                 showDeletedText,
-                suggestionMode
+                inSuggestingMode
             };
         }
     },

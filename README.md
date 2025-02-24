@@ -155,3 +155,11 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+
+## Todo's yet
+
+- Cleanup tests
+- accept/reject suggestions
+- hovers for suggestions
+- handle when toggling between suggestion mode and normal mode

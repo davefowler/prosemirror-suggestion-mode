@@ -30,16 +30,7 @@ window.addEventListener("load", () => {
             history(),
             keymap(baseKeymap),
             suggestionsPlugin
-        ],
-
-        // Initialize the suggestions state
-        suggestions: {
-            suggestionMode: true,
-            showDeletedText: true,
-            // you can put any meta data you need here
-            // This data can be used to display info or trigger actions on changes
-            metaData: { user: 'Anonymous', timestamp: Date.now() }
-        }
+        ]
     })
 
     // Create the editor view
@@ -48,25 +39,24 @@ window.addEventListener("load", () => {
         dispatchTransaction(transaction) {
             let newState = view.state.apply(transaction)
             view.updateState(newState)
-            
-            // Update the mode indicator when suggestion mode changes
-            const suggestionState = suggestionsPluginKey.getState(newState)
-            const modeIndicator = document.querySelector("#modeIndicator")
-            modeIndicator.textContent = ""
-            
-            const toggleCheckbox = document.querySelector("#toggleSuggestionMode")
-            toggleCheckbox.checked = suggestionState.suggestionMode
         }
     })
+
+    // Initialize the suggestions state
+    view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+        inSuggestingMode: document.querySelector("#toggleSuggestionMode").checked,
+        showDeletedText: document.querySelector("#showDeletedText").checked,
+        metaData: { user: 'Anonymous', timestamp: Date.now() }
+    }))
 
     // Add event listeners for the controls
     document.querySelector("#toggleSuggestionMode").addEventListener("change", (e) => {
         console.log('Checkbox changed:', e.target.checked); // Debugging log
         const state = suggestionsPluginKey.getState(view.state)
-        console.log('Current suggestionMode state:', state.suggestionMode); // Debugging log
+        console.log('Current suggestionMode state:', state.inSuggestingMode); // Debugging log
         view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
             ...state,
-            suggestionMode: e.target.checked,
+            inSuggestingMode: e.target.checked,
         }))
     })
 
