@@ -61,7 +61,7 @@ describe('ProseMirror Suggestions Plugin', () => {
                 return false
             })
             
-            expect(decos.some(d => d.class === 'suggestion-add')).toBe(true)
+            expect(decos.some(d => d.spec && d.spec.class === 'suggestion-add')).toBe(true)
             expect(newState.doc.textContent).toBe('Hello world test')
         })
 
@@ -80,8 +80,8 @@ describe('ProseMirror Suggestions Plugin', () => {
             })
             
             expect(decos.some(d => 
-                d.class === 'suggestion-delete' || 
-                (d.type.name === 'widget' && d.spec.class === 'deletion-marker')
+                (d.spec && d.spec.class === 'suggestion-delete') || 
+                (d.type && d.type.name === 'widget' && d.spec && d.spec.class === 'deletion-marker')
             )).toBe(true)
             expect(newState.doc.textContent).toBe('Hello ')
         })
@@ -132,7 +132,7 @@ describe('ProseMirror Suggestions Plugin', () => {
                 return false
             })
             
-            const changeDeco = decos.find(d => d.spec.class === 'suggestion-add')
+            const changeDeco = decos.find(d => d.spec && d.spec.class === 'suggestion-add')
             expect(changeDeco).toBeDefined()
             expect(changeDeco.spec.metadata).toEqual(expect.objectContaining({
                 user: expect.any(String),

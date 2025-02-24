@@ -23,9 +23,8 @@ export class ChangesetDecorator {
                     class: 'suggestion-add',
                     inclusiveStart: true,
                     inclusiveEnd: false,
-                    attributes: { 'data-suggestion': 'add' },
-                    metadata
-                }))
+                    attributes: { 'data-suggestion': 'add' }
+                }, metadata))
             } else if (change.deleted) {
                 // Handle deletions
                 if (this.showDeletedText) {
@@ -36,8 +35,8 @@ export class ChangesetDecorator {
                         attributes: {
                             'data-suggestion': 'delete',
                             'data-deleted-text': change.deleted
-                        },
-                        metadata
+                        }
+                    }, metadata))
                     }))
                 } else {
                     decos.push(Decoration.widget(change.from, () => {
