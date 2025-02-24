@@ -49,8 +49,38 @@ export const suggestionsPlugin = new Plugin({
         const change = tracker.recordChange(oldState, newState)
         if (!change) return null
 
-        // No need to modify the transaction - changes are tracked in the changeset
-        return null
+        console.log('Change detected:', change)
+
+        let tr = newState.tr
+
+        // Handle text insertions
+        if (change.type === 'insertion') {
+            tr = tr.addMark(
+                change.from,
+                change.to,
+                newState.schema.marks.suggestion_add.create({
+                    username: pluginState.username,
+                    timestamp: Date.now()
+                })
+            )
+            console.log('Added suggestion mark:', change.from, change.to)
+        }
+
+        // Handle text deletions
+        if (change.type === 'deletion') {
+            tr = tr.addMark(
+                change.from,
+                change.to,
+                newState.schema.marks.suggestion_delete.create({
+                    username: pluginState.username,
+                    timestamp: Date.now(),
+                    deletedText: oldState.doc.textBetween(change.from, change.to)
+                })
+            )
+            console.log('Added deletion mark:', change.from, change.to)
+        }
+
+        return tr
     },
 
     state: {
