@@ -4,18 +4,8 @@ import { suggestionsPlugin, suggestionsPluginKey } from "../suggestions"
 import { history } from "prosemirror-history"
 import { ChangeSet } from "prosemirror-changeset"
 
-// Mock EditorView
-class MockView {
-    constructor(state) {
-        this.state = state
-    }
-    dispatch(tr) {
-        this.state = this.state.apply(tr)
-    }
-}
-
 describe('ProseMirror Suggestions Plugin', () => {
-    let state, view
+    let state
 
     beforeEach(() => {
         state = EditorState.create({
