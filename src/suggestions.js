@@ -19,7 +19,15 @@ export const suggestionsPlugin = new Plugin({
 
     appendTransaction(transactions, oldState, newState) {
         const pluginState = this.getState(oldState)
-        if (!pluginState.suggestionMode) return null
+        if (!pluginState.suggestionMode) {
+            console.log('Suggestion mode disabled - not tracking changes')
+            return null
+        }
+
+        console.log('Processing transaction:', {
+            docChanged: transactions.some(tr => tr.docChanged),
+            steps: transactions.map(tr => tr.steps.length).reduce((a, b) => a + b, 0)
+        })
 
         // Record changes in the tracker
         const change = tracker.recordChange(oldState, newState)

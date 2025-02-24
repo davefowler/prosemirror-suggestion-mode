@@ -6,10 +6,14 @@ export class ChangesetDecorator {
     }
 
     createDecorations(doc, changeset) {
-        if (!changeset || !changeset.changes) return DecorationSet.empty
+        if (!changeset || !changeset.changes) {
+            console.log('No changeset or changes to decorate')
+            return DecorationSet.empty
+        }
 
         const decos = []
         const changes = Array.isArray(changeset.changes) ? changeset.changes : []
+        console.log(`Creating decorations for ${changes.length} changes`)
 
         changes.forEach(change => {
             const metadata = {
