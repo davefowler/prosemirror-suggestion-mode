@@ -36,10 +36,16 @@ export class ChangesetTracker {
 
   // Record a change in the current session
   recordChange(oldState, newState) {
-    if (!this.currentSession) return null
+    if (!this.currentSession) {
+      console.log('No active session for change recording')
+      return null
+    }
 
     const changeset = ChangeSet.create(oldState.doc, newState.doc)
-    if (!changeset || !changeset.changes || changeset.changes.length === 0) return null
+    if (!changeset || !changeset.changes || changeset.changes.length === 0) {
+      console.log('No changes detected in changeset')
+      return null
+    }
 
     const metadata = {
       ...this.currentSession,
@@ -48,10 +54,19 @@ export class ChangesetTracker {
 
     // Add metadata to changeset
     this.changeset = {
-      changes: changeset.changes.map(change => ({
-        ...change,
-        metadata
-      })),
+      changes: changeset.changes.map(change => {
+        console.log('Recording change:', {
+          type: change.inserted ? 'insertion' : change.deleted ? 'deletion' : 'other',
+          from: change.from,
+          to: change.to,
+          content: change.inserted || change.deleted || '',
+          metadata
+        })
+        return {
+          ...change,
+          metadata
+        }
+      }),
       metadata
     }
     
