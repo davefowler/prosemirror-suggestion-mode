@@ -9,9 +9,10 @@ export class ChangesetDecorator {
         const decos = []
 
         // Process each change in the changeset
-        if (!changeset || !changeset.changes) return DecorationSet.empty
+        if (!changeset) return DecorationSet.empty
 
-        changeset.changes.forEach(change => {
+        const changes = changeset.changes || []
+        changes.forEach(change => {
             if (change.type === 'insertion') {
                 // Add insertion decoration
                 decos.push(Decoration.inline(change.from, change.to, {

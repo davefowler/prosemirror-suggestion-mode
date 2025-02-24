@@ -39,13 +39,16 @@ export class ChangesetTracker {
     if (!this.currentSession) return null
 
     const change = ChangeSet.create(oldState.doc, newState.doc)
-    change.setMetadata({
+    const metadata = {
       ...this.currentSession,
       timestamp: Date.now()
-    })
+    }
     
-    this.changeset = this.changeset.compose(change)
-    return change
+    // Create a new changeset with the metadata
+    const newChangeset = new ChangeSet(change.changes, metadata)
+    this.changeset = this.changeset ? this.changeset.compose(newChangeset) : newChangeset
+    
+    return newChangeset
   }
 
   // Get all changes in the current session

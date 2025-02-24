@@ -50,6 +50,15 @@ describe('ProseMirror Suggestions Plugin', () => {
         // Verify changeset was created
         const decorations = suggestionsPlugin.spec.props.decorations(newState)
         expect(decorations).toBeDefined()
+        expect(decorations.find).toBeDefined()
+        
+        // Get all decorations
+        const decos = []
+        decorations.find(0, newState.doc.content.size, spec => {
+            decos.push(spec)
+            return false
+        })
+        expect(decos.length).toBeGreaterThan(0)
     })
 
     test('should track text deletion', () => {
