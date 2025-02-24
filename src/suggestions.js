@@ -1,48 +1,16 @@
 import { Plugin, PluginKey } from "prosemirror-state"
-import { ChangesetTracker } from "./changesetTracker.js"
+import { ChangeSet } from "prosemirror-changeset"
 import { ChangesetDecorator } from "./changesetDecorator.js"
 
 export const suggestionsPluginKey = new PluginKey("suggestions")
 
-// Create instances
-const tracker = new ChangesetTracker()
-const decorator = new ChangesetDecorator()
-
-// Initialize tracker session
-tracker.startSession({
-    user: 'Anonymous',
-    timestamp: Date.now()
-})
-
 export const suggestionsPlugin = new Plugin({
     key: suggestionsPluginKey,
 
-    appendTransaction(transactions, oldState, newState) {
-        const pluginState = this.getState(oldState)
-        if (!pluginState.suggestionMode) {
-            console.log('Suggestion mode disabled - not tracking changes')
-            return null
-        }
-
-        console.log('Processing transaction:', {
-            docChanged: transactions.some(tr => tr.docChanged),
-            steps: transactions.map(tr => tr.steps.length).reduce((a, b) => a + b, 0)
-        })
-
-        // Record changes in the tracker
-        const change = tracker.recordChange(oldState, newState)
-        if (!change) return null
-
-        // Get decorations from the decorator
-        const decorations = decorator.createDecorations(newState.doc, change)
-        
-        // Store decorations in the transaction metadata
-        return newState.tr.setMeta(this, { decorations })
-    },
-
     state: {
-        init() {
+        init(_, { doc }) {
             return {
+                changeSet: ChangeSet.create(doc),
                 suggestionMode: true,
                 username: 'Anonymous',
                 showDeletedText: true,
@@ -53,25 +21,33 @@ export const suggestionsPlugin = new Plugin({
             }
         },
         
-        apply(tr, value) {
-            // If there's metadata associated with this transaction, merge it into the current state
-            const meta = tr.getMeta(suggestionsPlugin);
-            if (meta) {
-                return {
-                    ...value,
-                    ...meta
-                }
+        apply(tr, value, oldState, newState) {
+            if (!tr.docChanged) return value
+
+            const stepMaps = tr.steps.map(step => step.getMap())
+            const data = { user: value.username, timestamp: Date.now() }
+
+            const updatedChangeSet = value.changeSet.addSteps(newState.doc, stepMaps, data)
+
+            if (updatedChangeSet.changes.length > 0) {
+                console.log('Changes detected:', updatedChangeSet.changes)
+            } else {
+                console.log('No changes detected in changeset')
             }
-            // Otherwise, return the existing state as-is
-            return value
+
+            return {
+                ...value,
+                changeSet: updatedChangeSet
+            }
         }
     },
 
     props: {
         decorations(state) {
             const pluginState = this.getState(state)
+            const decorator = new ChangesetDecorator()
             decorator.setShowDeletedText(pluginState.showDeletedText)
-            return decorator.createDecorations(state.doc, tracker.changeset)
+            return decorator.createDecorations(state.doc, pluginState.changeSet)
         }
     }
 })

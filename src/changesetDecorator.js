@@ -21,9 +21,9 @@ export class ChangesetDecorator {
                 timestamp: changeset.metadata?.timestamp || Date.now()
             }
 
-            if (change.type === 'insertion') {
+            if (change.fromA === change.toA) {
                 // Handle insertions
-                decos.push(Decoration.inline(change.from, change.to, {
+                decos.push(Decoration.inline(change.fromB, change.toB, {
                     class: 'suggestion-add',
                     inclusiveStart: true,
                     inclusiveEnd: false,
@@ -32,11 +32,11 @@ export class ChangesetDecorator {
                         'data-inserted': change.inserted
                     }
                 }))
-            } else if (change.type === 'deletion') {
+            } else {
                 // Handle deletions
                 if (this.showDeletedText) {
-                    decos.push(Decoration.inline(change.from, change.to, {
-                        class: 'suggestion-delete expanded',
+                    decos.push(Decoration.inline(change.fromA, change.toA, {
+                        class: 'suggestion-delete',
                         inclusiveStart: true,
                         inclusiveEnd: false,
                         attributes: {
@@ -44,11 +44,8 @@ export class ChangesetDecorator {
                             'data-deleted-text': change.deleted
                         }
                     }))
-                    
-                    // Add tooltip for expanded deletion
-                    decos.push(this.createTooltip(change, metadata))
                 } else {
-                    decos.push(Decoration.widget(change.from, () => {
+                    decos.push(Decoration.widget(change.fromA, () => {
                         const marker = document.createElement('span')
                         marker.className = 'deletion-marker'
                         marker.setAttribute('data-deleted-text', change.deleted)
@@ -57,13 +54,7 @@ export class ChangesetDecorator {
                         metadata,
                         side: 1 
                     }))
-                    
-                    // Add tooltip for compact deletion
-                    decos.push(this.createTooltip(change, metadata))
                 }
-            } else if (change.inserted) {
-                // Add tooltip for insertion
-                decos.push(this.createTooltip(change, metadata))
             }
         })
 
