@@ -44,13 +44,17 @@ export class ChangesetTracker {
       timestamp: Date.now()
     }
     
-    // Add metadata to the change
-    change.setMeta(metadata)
+    // Create a new changeset with metadata
+    const newChange = {
+      ...change,
+      metadata: metadata,
+      type: this.determineChangeType(oldState, newState)
+    }
     
     // Update the changeset
-    this.changeset = change
+    this.changeset = newChange
     
-    return change
+    return newChange
   }
 
   // Get all changes in the current session
@@ -69,5 +73,15 @@ export class ChangesetTracker {
   // Reject a specific change
   rejectChange(changeId) {
     // TODO: Implement change rejection
+  }
+
+  // Helper to determine if a change is an insertion or deletion
+  determineChangeType(oldState, newState) {
+    if (newState.doc.textContent.length > oldState.doc.textContent.length) {
+      return 'insertion'
+    } else if (newState.doc.textContent.length < oldState.doc.textContent.length) {
+      return 'deletion'
+    }
+    return 'modification'
   }
 }
