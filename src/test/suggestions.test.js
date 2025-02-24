@@ -61,8 +61,15 @@ describe('ProseMirror Suggestions Plugin', () => {
                 return false
             })
             
-            expect(decos.some(d => d.spec && d.spec.class === 'suggestion-add')).toBe(true)
+            // Verify the changeset contains the insertion
+            const changes = decorations.find()
+            expect(changes.length).toBeGreaterThan(0)
             expect(newState.doc.textContent).toBe('Hello world test')
+            
+            // Verify metadata
+            const change = changes[0]
+            expect(change.spec.metadata).toBeDefined()
+            expect(change.spec.metadata.user).toBe('Anonymous')
         })
 
         test('should track text deletion with changeset', () => {
@@ -79,11 +86,15 @@ describe('ProseMirror Suggestions Plugin', () => {
                 return false
             })
             
-            expect(decos.some(d => 
-                (d.spec && d.spec.class === 'suggestion-delete') || 
-                (d.type && d.type.name === 'widget' && d.spec && d.spec.class === 'deletion-marker')
-            )).toBe(true)
+            // Verify the changeset contains the deletion
+            const changes = decorations.find()
+            expect(changes.length).toBeGreaterThan(0)
             expect(newState.doc.textContent).toBe('Hello ')
+            
+            // Verify the deleted content is tracked
+            const change = changes[0]
+            expect(change.spec.metadata).toBeDefined()
+            expect(change.spec.metadata.deletedText).toBe('world')
         })
     })
 
