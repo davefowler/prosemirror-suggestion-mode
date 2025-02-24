@@ -1,4 +1,4 @@
-import { Changeset } from "prosemirror-changeset"
+import { ChangeSet } from "prosemirror-changeset"
 
 // Configuration for changeset tracking
 const changesetConfig = {
@@ -12,7 +12,7 @@ const changesetConfig = {
 
 export class ChangesetTracker {
   constructor() {
-    this.changeset = new Changeset()
+    this.changeset = new ChangeSet()
     this.currentSession = null
   }
 
@@ -38,7 +38,7 @@ export class ChangesetTracker {
   recordChange(oldState, newState) {
     if (!this.currentSession) return null
 
-    const change = Changeset.create(oldState.doc, newState.doc)
+    const change = ChangeSet.create(oldState.doc, newState.doc)
     change.setMetadata({
       ...this.currentSession,
       timestamp: Date.now()
