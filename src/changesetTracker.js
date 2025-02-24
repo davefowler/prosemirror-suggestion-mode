@@ -42,32 +42,45 @@ export class ChangesetTracker {
     }
 
     const changeset = ChangeSet.create(oldState.doc, newState.doc)
-    if (!changeset || !changeset.changes || changeset.changes.length === 0) {
+    console.log('Raw changeset:', changeset)
+
+    // Extract changes from the changeset
+    const changes = []
+    changeset.forEach((fromA, toA, fromB, toB) => {
+      console.log('Change detected:', { fromA, toA, fromB, toB })
+      
+      if (fromA === toA) {
+        // This is an insertion
+        changes.push({
+          type: 'insertion',
+          from: fromB,
+          to: toB,
+          inserted: newState.doc.textBetween(fromB, toB),
+          metadata: this.currentSession
+        })
+      } else if (fromB === toB) {
+        // This is a deletion
+        changes.push({
+          type: 'deletion',
+          from: fromB,
+          to: fromB + 1,
+          deleted: oldState.doc.textBetween(fromA, toA),
+          metadata: this.currentSession
+        })
+      }
+    })
+
+    if (changes.length === 0) {
       console.log('No changes detected in changeset')
       return null
     }
 
-    const metadata = {
-      ...this.currentSession,
-      timestamp: Date.now()
-    }
+    console.log('Processed changes:', changes)
 
-    // Add metadata to changeset
+    // Store the changes
     this.changeset = {
-      changes: changeset.changes.map(change => {
-        console.log('Recording change:', {
-          type: change.inserted ? 'insertion' : change.deleted ? 'deletion' : 'other',
-          from: change.from,
-          to: change.to,
-          content: change.inserted || change.deleted || '',
-          metadata
-        })
-        return {
-          ...change,
-          metadata
-        }
-      }),
-      metadata
+      changes,
+      metadata: this.currentSession
     }
     
     return this.changeset

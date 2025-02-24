@@ -21,18 +21,21 @@ export class ChangesetDecorator {
                 timestamp: changeset.metadata?.timestamp || Date.now()
             }
 
-            if (change.inserted) {
+            if (change.type === 'insertion') {
                 // Handle insertions
                 decos.push(Decoration.inline(change.from, change.to, {
                     class: 'suggestion-add',
                     inclusiveStart: true,
                     inclusiveEnd: false,
-                    attributes: { 'data-suggestion': 'add' }
-                }, metadata))
-            } else if (change.deleted) {
+                    attributes: { 
+                        'data-suggestion': 'add',
+                        'data-inserted': change.inserted
+                    }
+                }))
+            } else if (change.type === 'deletion') {
                 // Handle deletions
                 if (this.showDeletedText) {
-                    decos.push(Decoration.inline(change.from, change.from + 1, {
+                    decos.push(Decoration.inline(change.from, change.to, {
                         class: 'suggestion-delete expanded',
                         inclusiveStart: true,
                         inclusiveEnd: false,
@@ -40,7 +43,7 @@ export class ChangesetDecorator {
                             'data-suggestion': 'delete',
                             'data-deleted-text': change.deleted
                         }
-                    }, metadata))
+                    }))
                     
                     // Add tooltip for expanded deletion
                     decos.push(this.createTooltip(change, metadata))
