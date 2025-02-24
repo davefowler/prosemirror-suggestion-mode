@@ -1,97 +1,148 @@
-# Project Prompt: ProseMirrorSuggestions
+# Project Prompt: ProseMirror Suggestions with Changeset Tracking
 
 ## Project Overview
 
-Create a ProseMirror extension called **ProseMirrorSuggestions** that allows users to toggle a **suggestion mode**, similar to Google Docs' suggestion or "track changes" feature. When **suggestion mode** is active:
+Create a ProseMirror extension that implements a suggestion mode using prosemirror-changeset for tracking changes. The extension should provide functionality similar to Google Docs' suggestion mode, but using changesets instead of marks for tracking modifications.
 
-1. **Text Insertions:** Any newly inserted text should automatically be wrapped in a mark (`suggestion_add`). This mark should visually highlight the inserted text with a green background.
+## Key Features
 
-2. **Text Deletions:** Instead of immediately deleting selected text, create a **suggestion deletion mark** (`suggestion_delete`).
+1. **Change Tracking:**
+   - Use prosemirror-changeset to track all document modifications
+   - Store metadata with each change (user, timestamp, etc.)
+   - Support both insertions and deletions
 
-   - The UI should not show the deleted text directly. Instead, show a small red square (or button) in the document where the deletion occurred.
-   - When the user hovers over this red square, the deleted text should be revealed (e.g., using a tooltip or by changing the color to make the text visible).
-   - This approach minimizes noise during review, keeping the document cleaner and easier to read.
+2. **Visual Representation:**
+   - Show inserted text with green background
+   - Show deleted text as red squares that reveal content on hover
+   - Support toggling between showing/hiding deleted text
+   - Provide tooltips showing change metadata
 
-3. **Accepting & Rejecting Suggestions:** The extension should provide API methods to accept or reject individual suggestions. Accepting an addition should remove the suggestion mark and normalize the content. Rejecting an addition should remove the added text. For deletions, accepting should remove the text, while rejecting should restore it.
+3. **Change Management:**
+   - Accept/reject individual changes
+   - Batch accept/reject multiple changes
+   - Maintain change history for undo/redo support
 
----
+## Technical Implementation
 
-## Example User Flows
+### 1. Changeset Configuration
 
-### 1. **Toggling Suggestion Mode**
-
-- The user clicks a "Toggle Suggestion Mode" button in the UI.
-- When enabled, any new changes are treated as suggestions rather than immediate edits.
-
-### 2. **Making Suggestions**
-
-- **Adding Text:** While suggestion mode is on, typing new text should automatically mark it with `suggestion_add`.
-- **Deleting Text:** Selecting text and executing a deletion should not remove the text immediately. Instead, the text should be marked with `suggestion_delete` and represented by a small red square.
-
-### 3. **Reviewing Suggestions**
-
-- When in review mode, the UI should display all suggestions.
-- The reviewer can hover over red squares to see suggested deletions.
-- The reviewer can accept or reject suggestions through UI controls.
-
----
-
-## Key Components to Implement
-
-### 1. **Schema Extensions**
-
-Add two marks to the ProseMirror schema:
-
-```js
-// Mark for suggested additions
-const suggestion_add = {
-  attrs: { createdAt: { default: null } },
-  parseDOM: [{ tag: "span[data-suggestion-add]" }],
-  toDOM(mark) {
-    return ["span", { "data-suggestion-add": "true", class: "suggestion-add" }, 0];
+```javascript
+const changesetConfig = {
+  complexSteps: true,
+  metadata: {
+    user: String,
+    timestamp: Number,
+    sessionId: String
   }
-};
-
-// Mark for suggested deletions
-const suggestion_delete = {
-  attrs: { createdAt: { default: null }, hiddenText: { default: "" } },
-  parseDOM: [{ tag: "span[data-suggestion-delete]" }],
-  toDOM(mark) {
-    return ["span", { "data-suggestion-delete": "true", class: "suggestion-delete", "data-hidden-text": mark.attrs.hiddenText }, 0];
-  }
-};
+}
 ```
 
----
+### 2. Core Components
 
-## Desired Outcome
+1. **ChangesetTracker:**
+   - Maintains the current changeset
+   - Records changes with metadata
+   - Provides methods for accepting/rejecting changes
 
-The AI should produce a working extension for ProseMirror that includes:
+2. **ChangesetDecorator:**
+   - Converts changesets to ProseMirror decorations
+   - Handles visual representation of changes
+   - Manages tooltips and hover states
 
-1. **Suggestion Mode Toggle:** Ability to switch between normal edit mode and suggestion mode.
-2. **Mark Insertions and Deletions:** Insertions appear with a green highlight. Deletions show as red squares that reveal text on hover.
-3. **Accept/Reject Suggestions:** Implement UI buttons or API methods to manage suggestions.
-4. **Styling:** Clean, minimal CSS that differentiates between normal, added, and deleted text.
-5. **Example HTML Page:** A test page where all features can be tested interactively.
+3. **SuggestionsPlugin:**
+   - Coordinates between tracker and decorator
+   - Handles user interactions
+   - Manages suggestion mode state
 
----
+## User Interface
+
+1. **Controls:**
+   - Toggle suggestion mode
+   - Show/hide deleted text
+   - Accept/reject buttons for changes
+   - Change navigation
+
+2. **Visual Indicators:**
+   - Green background for insertions
+   - Red squares for deletions
+   - Tooltips showing:
+     - Change type
+     - User
+     - Timestamp
+     - Deleted content (for deletions)
+
+## Implementation Steps
+
+1. **Setup:**
+   - Install dependencies (prosemirror-changeset)
+   - Configure basic ProseMirror editor
+   - Initialize changeset tracking
+
+2. **Change Tracking:**
+   - Implement ChangesetTracker
+   - Configure metadata handling
+   - Set up change recording
+
+3. **Visual Display:**
+   - Implement ChangesetDecorator
+   - Create decoration mapping
+   - Style changes appropriately
+
+4. **User Interaction:**
+   - Add suggestion mode toggle
+   - Implement change acceptance/rejection
+   - Add hover interactions
+
+5. **Testing:**
+   - Unit tests for tracker
+   - Integration tests for plugin
+   - UI interaction tests
 
 ## Additional Considerations
 
-- **Undo/Redo Support:** Ensure that suggestions play nicely with undo/redo behavior.
-- **Acceptance/Rejection of Suggestions:** Build UI elements or API methods to accept/reject suggestions.
-- **Performance:** Handle large documents gracefully, keeping the suggestion logic performant.
-- **Error Handling:** Avoid edge cases like empty selections, nested marks, and ensure smooth behavior with ProseMirror's history plugin.
+- **Performance:** Efficient handling of large documents and many changes
+- **Persistence:** Serialization of changesets for storage
+- **Collaboration:** Potential integration with collaborative editing
+- **Accessibility:** Ensure changes are accessible to screen readers
 
----
+## Example Usage
 
-## Goals for the AI (e.g., Aider)
+```javascript
+const suggestionPlugin = new SuggestionsPlugin({
+  user: "current-user",
+  onChange: (changeset) => {
+    // Handle changeset updates
+  },
+  onAccept: (change) => {
+    // Handle change acceptance
+  },
+  onReject: (change) => {
+    // Handle change rejection
+  }
+})
+```
 
-1. **Setup ProseMirror Environment:** Create a simple ProseMirror editor instance with minimal setup.
-2. **Implement the Suggestion Mode Plugin:** Add functionality to toggle suggestion mode.
-3. **Create Insertion & Deletion Handlers:** Implement automatic marking of insertions and deletions as suggestions.
-4. **Style the Suggestions in the UI:** Apply CSS to visually distinguish additions and deletions.
-5. **Provide Accept/Reject Methods:** Add UI or API methods to manage suggestions.
-6. **Ensure Functionality & Testability:** Provide an example HTML page to test the feature.
+## Testing Requirements
 
----
+1. **Unit Tests:**
+   - Changeset creation
+   - Change tracking accuracy
+   - Metadata handling
+
+2. **Integration Tests:**
+   - Plugin initialization
+   - Change recording
+   - Visual representation
+
+3. **UI Tests:**
+   - Suggestion mode toggle
+   - Change acceptance/rejection
+   - Hover interactions
+
+## Deliverables
+
+1. Working ProseMirror plugin
+2. Example implementation
+3. Test suite
+4. Documentation
+5. Performance benchmarks
