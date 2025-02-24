@@ -1,14 +1,31 @@
 import { EditorState } from "prosemirror-state"
 import { EditorView } from "prosemirror-view"
 import { Schema, DOMParser } from "prosemirror-model"
-import { schema } from "prosemirror-schema-basic"
+import { schema as basicSchema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
 import { baseKeymap } from "prosemirror-commands"
 import { keymap } from "prosemirror-keymap"
 import { history } from "prosemirror-history"
-import { suggestionsPlugin, suggestionsPluginKey } from "./suggestions.js"
+import { suggestionsPlugin, suggestionsPluginKey, SuggestionsPluginState } from "./suggestions"
 
-const mySchema = schema
+// Export all components for library usage
+export { schema } from './schema';
+export { 
+  suggestionsPlugin, 
+  suggestionsPluginKey,
+  type SuggestionsPluginState,
+  type SuggestionsMeta,
+  type ChangeMetadata
+} from './suggestions';
+
+const mySchema = basicSchema;
+
+// Declare global window property for the editor view
+declare global {
+  interface Window {
+    view: EditorView;
+  }
+}
 
 // Initialize the editor with the suggestions plugin
 window.addEventListener("load", () => {
@@ -34,32 +51,49 @@ window.addEventListener("load", () => {
     })
 
     // Create the editor view
-    window.view = new EditorView(document.querySelector("#editor"), {state})
+    const editorElement = document.querySelector("#editor");
+    if (!editorElement) {
+        console.error("Editor element not found");
+        return;
+    }
+    
+    window.view = new EditorView(editorElement, {state})
 
     // Initialize the suggestions state
-    view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
-        inSuggestingMode: document.querySelector("#toggleSuggestionMode").checked,
-        showDeletedText: document.querySelector("#showDeletedText").checked,
-        metaData: { user: 'Anonymous', timestamp: Date.now() }
-    }))
-
-    // Add event listeners for the controls
-    document.querySelector("#toggleSuggestionMode").addEventListener("change", (e) => {
-        console.log('Checkbox changed:', e.target.checked); // Debugging log
-        const state = suggestionsPluginKey.getState(view.state)
-        console.log('Current suggestionMode state:', state.inSuggestingMode); // Debugging log
+    const toggleElement = document.querySelector("#toggleSuggestionMode") as HTMLInputElement;
+    const showDeletedElement = document.querySelector("#showDeletedText") as HTMLInputElement;
+    
+    if (toggleElement && showDeletedElement) {
         view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
-            ...state,
-            inSuggestingMode: e.target.checked,
+            inSuggestingMode: toggleElement.checked,
+            showDeletedText: showDeletedElement.checked,
+            metadata: { user: 'Anonymous', timestamp: Date.now() }
         }))
-    })
 
-    document.querySelector("#showDeletedText").addEventListener("change", (e) => {
-        const state = suggestionsPluginKey.getState(view.state)
-        console.log('changing showDeletedText to', e.target.checked)
-        view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
-            ...state,
-            showDeletedText: e.target.checked
-        }))
-    })
+        // Add event listeners for the controls
+        toggleElement.addEventListener("change", (e) => {
+            console.log('Checkbox changed:', (e.target as HTMLInputElement).checked);
+            const state = suggestionsPluginKey.getState(view.state);
+            if (state) {
+                console.log('Current suggestionMode state:', state.inSuggestingMode);
+                view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+                    ...state,
+                    inSuggestingMode: (e.target as HTMLInputElement).checked,
+                }))
+            }
+        })
+
+        showDeletedElement.addEventListener("change", (e) => {
+            const state = suggestionsPluginKey.getState(view.state);
+            if (state) {
+                console.log('changing showDeletedText to', (e.target as HTMLInputElement).checked)
+                view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+                    ...state,
+                    showDeletedText: (e.target as HTMLInputElement).checked
+                }))
+            }
+        })
+    } else {
+        console.error("Control elements not found");
+    }
 })
