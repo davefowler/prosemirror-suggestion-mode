@@ -67,7 +67,7 @@ function injectStyles(): void {
 function createInsertionDecoration(change: Change): Decoration {
     return Decoration.inline(change.fromB, change.toB, { 
       class: 'suggestion-add',
-      metadata: change.meta as ChangeMetadata
+      'data-metadata': JSON.stringify(change.data)
     });
 }
 
@@ -85,10 +85,10 @@ function createDeletionDecoration(change: Change, originalDoc: Node, showDeleted
         }
         return container;
     }, { 
-      metadata: { 
-        ...(change.meta as ChangeMetadata), 
+      'data-metadata': JSON.stringify({
+        ...change.data,
         deletedText 
-      } 
+      })
     });
 }
 

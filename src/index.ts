@@ -63,7 +63,7 @@ window.addEventListener("load", () => {
     const showDeletedElement = document.querySelector("#showDeletedText") as HTMLInputElement;
     
     if (toggleElement && showDeletedElement) {
-        view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+        window.view.dispatch(window.view.state.tr.setMeta(suggestionsPlugin, {
             inSuggestingMode: toggleElement.checked,
             showDeletedText: showDeletedElement.checked,
             metadata: { user: 'Anonymous', timestamp: Date.now() }
@@ -72,10 +72,10 @@ window.addEventListener("load", () => {
         // Add event listeners for the controls
         toggleElement.addEventListener("change", (e) => {
             console.log('Checkbox changed:', (e.target as HTMLInputElement).checked);
-            const state = suggestionsPluginKey.getState(view.state);
+            const state = suggestionsPluginKey.getState(window.view.state);
             if (state) {
                 console.log('Current suggestionMode state:', state.inSuggestingMode);
-                view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+                window.view.dispatch(window.view.state.tr.setMeta(suggestionsPlugin, {
                     ...state,
                     inSuggestingMode: (e.target as HTMLInputElement).checked,
                 }))
@@ -83,10 +83,10 @@ window.addEventListener("load", () => {
         })
 
         showDeletedElement.addEventListener("change", (e) => {
-            const state = suggestionsPluginKey.getState(view.state);
+            const state = suggestionsPluginKey.getState(window.view.state);
             if (state) {
                 console.log('changing showDeletedText to', (e.target as HTMLInputElement).checked)
-                view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+                window.view.dispatch(window.view.state.tr.setMeta(suggestionsPlugin, {
                     ...state,
                     showDeletedText: (e.target as HTMLInputElement).checked
                 }))
