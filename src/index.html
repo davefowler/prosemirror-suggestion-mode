@@ -38,10 +38,34 @@
         .suggestion-delete {
             position: relative;
             cursor: pointer;
-            background-color: #ffe6e6;
-            text-decoration: line-through;
-            color: #cc0000;
-            border-bottom: 2px solid #cc0000;
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #ff4444;
+            border-radius: 2px;
+            margin: 0 2px;
+            vertical-align: middle;
+        }
+
+        .suggestion-delete::after {
+            content: attr(data-deleted-text);
+            position: absolute;
+            display: none;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            color: #666;
+            z-index: 1000;
+        }
+
+        .suggestion-delete:hover::after {
+            display: block;
         }
         /* When compact (showDeletedText is false) */
         .suggestion-delete.compact {

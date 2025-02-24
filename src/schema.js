@@ -19,9 +19,25 @@ const suggestionMarks = {
             timestamp: { default: 0 },
             deletedText: { default: '' }
         },
-        inclusive: true,
-        parseDOM: [{ tag: "span.suggestion-delete" }],
-        toDOM() { return ["span", { class: "suggestion-delete" }, 0] }
+        inclusive: false,
+        parseDOM: [{ 
+            tag: "span.suggestion-delete",
+            getAttrs(dom) {
+                return {
+                    username: dom.getAttribute('data-username'),
+                    timestamp: Number(dom.getAttribute('data-timestamp')),
+                    deletedText: dom.getAttribute('data-deleted-text')
+                }
+            }
+        }],
+        toDOM(mark) {
+            return ["span", {
+                class: "suggestion-delete",
+                'data-username': mark.attrs.username,
+                'data-timestamp': mark.attrs.timestamp,
+                'data-deleted-text': mark.attrs.deletedText
+            }, 0]
+        }
     }
 }
 

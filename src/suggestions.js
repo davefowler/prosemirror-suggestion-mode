@@ -45,40 +45,61 @@ export const suggestionsPlugin = new Plugin({
         const pluginState = this.getState(oldState)
         if (!pluginState.suggestionMode) return null
 
-        // Record changes in the tracker
-        const change = tracker.recordChange(oldState, newState)
-        if (!change) return null
-
-        console.log('Change detected:', change)
+        // Only process relevant transactions
+        const relevant = transactions.some(tr => 
+            tr.docChanged || tr.selectionSet || tr.storedMarksSet
+        )
+        if (!relevant) return null
 
         let tr = newState.tr
 
-        // Handle text insertions
-        if (change.type === 'insertion') {
-            tr = tr.addMark(
-                change.from,
-                change.to,
-                newState.schema.marks.suggestion_add.create({
-                    username: pluginState.username,
-                    timestamp: Date.now()
+        // Compare old and new doc to find changes
+        const changes = []
+        newState.doc.descendants((node, pos) => {
+            const oldNode = oldState.doc.nodeAt(pos)
+            if (!oldNode || node.text !== oldNode.text) {
+                changes.push({
+                    from: pos,
+                    to: pos + (node.text?.length || 0),
+                    type: 'insertion'
                 })
-            )
-            console.log('Added suggestion mark:', change.from, change.to)
-        }
+            }
+        })
 
-        // Handle text deletions
-        if (change.type === 'deletion') {
-            tr = tr.addMark(
-                change.from,
-                change.to,
-                newState.schema.marks.suggestion_delete.create({
+        // Handle deletions by comparing old doc positions
+        oldState.doc.descendants((node, pos) => {
+            const newNode = newState.doc.nodeAt(pos)
+            if (!newNode) {
+                changes.push({
+                    from: pos,
+                    to: pos + (node.text?.length || 0),
+                    type: 'deletion',
+                    text: node.text
+                })
+            }
+        })
+
+        // Apply marks for each change
+        changes.forEach(change => {
+            if (change.type === 'insertion') {
+                tr = tr.addMark(
+                    change.from,
+                    change.to,
+                    newState.schema.marks.suggestion_add.create({
+                        username: pluginState.username,
+                        timestamp: Date.now()
+                    })
+                )
+            } else if (change.type === 'deletion') {
+                // Create a deletion widget at the position
+                const deletionMark = newState.schema.marks.suggestion_delete.create({
                     username: pluginState.username,
                     timestamp: Date.now(),
-                    deletedText: oldState.doc.textBetween(change.from, change.to)
+                    deletedText: change.text
                 })
-            )
-            console.log('Added deletion mark:', change.from, change.to)
-        }
+                tr = tr.addMark(change.from, change.from + 1, deletionMark)
+            }
+        })
 
         return tr
     },
