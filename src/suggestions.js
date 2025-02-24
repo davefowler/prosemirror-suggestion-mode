@@ -126,77 +126,8 @@ export const suggestionsPlugin = new Plugin({
     props: {
         decorations(state) {
             const pluginState = this.getState(state)
-            const decos = []
-            
-            state.doc.descendants((node, pos) => {
-                // Handle suggestion_add marks
-                const addMark = node.marks.find(m => m.type.name === 'suggestion_add')
-                if (addMark) {
-                    decos.push(
-                        Decoration.widget(pos, () => {
-                            const tooltip = document.createElement('div')
-                            tooltip.className = 'suggestion-tooltip'
-                            tooltip.textContent = defaultTooltipRenderer(addMark, 'add')
-                            return tooltip
-                        }, {
-                            side: -1,
-                            key: `suggestion-add-${pos}`,
-                            class: 'suggestion-tooltip-wrapper'
-                        })
-                    )
-                }
-                
-                // Handle suggestion_delete marks
-                const delMark = node.marks.find(m => m.type.name === 'suggestion_delete')
-                if (delMark) {
-                    if (!pluginState.showDeletedText) {
-                        // When not showing deleted text, create a deletion marker with hover tooltip
-                        decos.push(
-                            Decoration.widget(pos, () => {
-                                // Create the hover tooltip
-                                const tooltip = document.createElement('span')
-                                tooltip.className = 'deletion-tooltip'
-                                tooltip.textContent = node.text || ''
-                                
-                                return tooltip
-                            }, {
-                                side: 1,
-                                key: `deletion-marker-${pos}`
-                            })
-                        )
-                        // WARNING - enabling this makes slection deletes break - it will turn two selection deletes into 3 as it tries to merge with the text node
-                        // Hide the actual deleted text
-                        // decos.push(
-                        //     Decoration.inline(pos, pos + node.nodeSize, {
-                        //         class: 'suggestion-delete hidden'
-                        //     })
-                        // )
-                    // } else {
-                    //     // When showing deleted text, show it with strikethrough
-                    //     decos.push(
-                    //         Decoration.inline(pos, pos + node.nodeSize, {
-                    //             class: 'suggestion-delete visible'
-                    //         })
-                    //     )
-                    }
-                    
-                    // Add metadata tooltip (author, date, etc.)
-                    decos.push(
-                        Decoration.widget(pos, () => {
-                            const tooltip = document.createElement('div')
-                            tooltip.className = 'suggestion-tooltip'
-                            tooltip.textContent = defaultTooltipRenderer(delMark, 'delete')
-                            return tooltip
-                        }, {
-                            side: -1,
-                            key: `suggestion-delete-${pos}`,
-                            class: 'suggestion-tooltip-wrapper'
-                        })
-                    )
-                }
-            })
-            
-            return DecorationSet.create(state.doc, decos)
+            decorator.setShowDeletedText(pluginState.showDeletedText)
+            return decorator.createDecorations(state.doc, tracker.changeset)
         },
 
         handleKeyDown(view, event) {
