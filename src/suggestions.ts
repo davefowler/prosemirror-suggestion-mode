@@ -65,9 +65,11 @@ function injectStyles(): void {
 
 // Insertion inline decoration
 function createInsertionDecoration(change: Change): Decoration {
+    // The metadata is stored in the inserted spans
+    const metadata = change.inserted.length > 0 ? change.inserted[0].data : null;
     return Decoration.inline(change.fromB, change.toB, { 
       class: 'suggestion-add',
-      'data-metadata': JSON.stringify(change.data)
+      'data-metadata': JSON.stringify(metadata)
     });
 }
 
@@ -75,6 +77,9 @@ function createInsertionDecoration(change: Change): Decoration {
 function createDeletionDecoration(change: Change, originalDoc: Node, showDeletedText: boolean): Decoration {
     // needs the original doc to get the deleted text using fromA and toA
     const deletedText = originalDoc.textBetween(change.fromA, change.toA, '', '\n')
+    // The metadata is stored in the deleted spans
+    const metadata = change.deleted.length > 0 ? change.deleted[0].data : null;
+    
     return Decoration.widget(change.fromB, () => {
         const container = document.createElement('span');
         container.className = 'suggestion-delete';
@@ -86,7 +91,7 @@ function createDeletionDecoration(change: Change, originalDoc: Node, showDeleted
         return container;
     }, { 
       'data-metadata': JSON.stringify({
-        ...change.data,
+        ...metadata,
         deletedText 
       })
     });
