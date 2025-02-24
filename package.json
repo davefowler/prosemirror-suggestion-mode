@@ -9,6 +9,7 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
+    "prosemirror-changeset": "^2.2.1",
     "prosemirror-commands": "^1.5.2",
     "prosemirror-history": "^1.4.1",
     "prosemirror-keymap": "^1.2.2",
