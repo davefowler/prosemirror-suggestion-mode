@@ -11,8 +11,9 @@ export class ChangesetDecorator {
         // Process each change in the changeset
         if (!changeset) return DecorationSet.empty
 
-        const changes = changeset.changes || []
-        changes.forEach(change => {
+        // Get changes from the changeset
+        const changes = changeset.getChanges ? changeset.getChanges() : []
+        for (const change of changes) {
             if (change.type === 'insertion') {
                 // Add insertion decoration
                 decos.push(Decoration.inline(change.from, change.to, {
@@ -49,7 +50,7 @@ export class ChangesetDecorator {
                 // Add tooltip
                 decos.push(this.createTooltip(change))
             }
-        })
+        }
 
         return DecorationSet.create(doc, decos)
     }
