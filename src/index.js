@@ -34,13 +34,7 @@ window.addEventListener("load", () => {
     })
 
     // Create the editor view
-    window.view = new EditorView(document.querySelector("#editor"), {
-        state,
-        dispatchTransaction(transaction) {
-            let newState = view.state.apply(transaction)
-            view.updateState(newState)
-        }
-    })
+    window.view = new EditorView(document.querySelector("#editor"), {state})
 
     // Initialize the suggestions state
     view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {

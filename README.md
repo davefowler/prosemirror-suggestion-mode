@@ -160,6 +160,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## Todo's yet
 
 - Cleanup tests
+- handle paste replaces
+- cursor issue after deletes - typing doesn't move to add
 - accept/reject suggestions
 - hovers for suggestions
 - handle when toggling between suggestion mode and normal mode
