@@ -1,9 +1,11 @@
-import {Plugin, PluginKey} from "prosemirror-state"
-import {Decoration, DecorationSet} from "prosemirror-view"
-import {ReplaceStep} from "prosemirror-transform"
+import { Plugin, PluginKey } from "prosemirror-state"
+import { Decoration, DecorationSet } from "prosemirror-view"
+import { ChangesetTracker } from "./changesetTracker"
 
-// Plugin key for accessing the plugin state
 export const suggestionsPluginKey = new PluginKey("suggestions")
+
+// Create changeset tracker instance
+const tracker = new ChangesetTracker()
 
 // Create the suggestions plugin
 // Default tooltip renderer that can be overridden
