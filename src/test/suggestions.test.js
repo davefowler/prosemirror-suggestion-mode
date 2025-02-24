@@ -61,7 +61,7 @@ describe('ProseMirror Suggestions Plugin', () => {
                 return false
             })
             
-            expect(decos.some(d => d.type.name === 'widget' && d.spec.class === 'suggestion-add')).toBe(true)
+            expect(decos.some(d => d.class === 'suggestion-add')).toBe(true)
             expect(newState.doc.textContent).toBe('Hello world test')
         })
 
@@ -80,8 +80,8 @@ describe('ProseMirror Suggestions Plugin', () => {
             })
             
             expect(decos.some(d => 
-                d.type.name === 'widget' && 
-                (d.spec.class === 'suggestion-delete' || d.spec.class === 'deletion-marker')
+                d.class === 'suggestion-delete' || 
+                (d.type.name === 'widget' && d.spec.class === 'deletion-marker')
             )).toBe(true)
             expect(newState.doc.textContent).toBe('Hello ')
         })

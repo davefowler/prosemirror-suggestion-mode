@@ -21,6 +21,9 @@ export class ChangesetDecorator {
                 // Handle insertions
                 decos.push(Decoration.inline(change.from, change.to, {
                     class: 'suggestion-add',
+                    inclusiveStart: true,
+                    inclusiveEnd: false,
+                    attributes: { 'data-suggestion': 'add' },
                     metadata
                 }))
             } else if (change.deleted) {
@@ -28,7 +31,12 @@ export class ChangesetDecorator {
                 if (this.showDeletedText) {
                     decos.push(Decoration.inline(change.from, change.from + 1, {
                         class: 'suggestion-delete expanded',
-                        'data-deleted-text': change.deleted,
+                        inclusiveStart: true,
+                        inclusiveEnd: false,
+                        attributes: {
+                            'data-suggestion': 'delete',
+                            'data-deleted-text': change.deleted
+                        },
                         metadata
                     }))
                 } else {
