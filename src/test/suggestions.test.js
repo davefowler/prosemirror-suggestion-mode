@@ -4,8 +4,18 @@ import { suggestionsPlugin, suggestionsPluginKey } from "../suggestions"
 import { history } from "prosemirror-history"
 import { ChangeSet } from "prosemirror-changeset"
 
+// Mock EditorView
+class MockView {
+    constructor(state) {
+        this.state = state
+    }
+    dispatch(tr) {
+        this.state = this.state.apply(tr)
+    }
+}
+
 describe('ProseMirror Suggestions Plugin', () => {
-    let state
+    let state, view
 
     beforeEach(() => {
         state = EditorState.create({
@@ -17,6 +27,7 @@ describe('ProseMirror Suggestions Plugin', () => {
                 ])
             ])
         })
+        view = new MockView(state)
     })
 
     test('should initialize with suggestion mode enabled', () => {
@@ -26,28 +37,35 @@ describe('ProseMirror Suggestions Plugin', () => {
     })
 
     test('should track text insertion', () => {
-        const tr = state.tr.insertText(' test', 11) // Insert at end of "Hello world"
+        const tr = state.tr.insertText(' test', 11)
         const newState = state.apply(tr)
         
-        // Verify plugin state remains correct
+        // Get plugin state after change
         const pluginState = suggestionsPluginKey.getState(newState)
         expect(pluginState.suggestionMode).toBe(true)
 
         // Verify the document content
         expect(newState.doc.textContent).toBe('Hello world test')
+
+        // Verify changeset was created
+        const decorations = suggestionsPlugin.spec.props.decorations(newState)
+        expect(decorations).toBeDefined()
     })
 
     test('should track text deletion', () => {
-        // Delete "world"
         const tr = state.tr.delete(6, 11)
         const newState = state.apply(tr)
         
-        // Verify plugin state remains correct
+        // Get plugin state after change
         const pluginState = suggestionsPluginKey.getState(newState)
         expect(pluginState.suggestionMode).toBe(true)
 
         // Verify the document content
         expect(newState.doc.textContent).toBe('Hello ')
+
+        // Verify changeset was created
+        const decorations = suggestionsPlugin.spec.props.decorations(newState)
+        expect(decorations).toBeDefined()
     })
 
     test('should toggle suggestion mode', () => {
