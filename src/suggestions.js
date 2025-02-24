@@ -26,15 +26,7 @@ export const suggestionsPlugin = new Plugin({
 
             const stepMaps = tr.steps.map(step => step.getMap())
             const data = { user: value.username, timestamp: Date.now() }
-
             const updatedChangeSet = value.changeSet.addSteps(newState.doc, stepMaps, data)
-
-            if (updatedChangeSet.changes.length > 0) {
-                console.log('Changes detected:', updatedChangeSet.changes)
-            } else {
-                console.log('No changes detected in changeset')
-            }
-
             return {
                 ...value,
                 changeSet: updatedChangeSet
