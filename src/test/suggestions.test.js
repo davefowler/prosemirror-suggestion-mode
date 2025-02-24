@@ -100,13 +100,13 @@ describe('ProseMirror Suggestions Plugin', () => {
     describe('Plugin State Management', () => {
         test('should toggle suggestion mode', () => {
             const tr = state.tr.setMeta(suggestionsPlugin, {
-                suggestionMode: false,
+                inSuggestingMode: false,
                 username: 'Anonymous'
             })
             const newState = state.apply(tr)
             
             const pluginState = suggestionsPluginKey.getState(newState)
-            expect(pluginState.suggestionMode).toBe(false)
+            expect(pluginState.inSuggestingMode).toBe(false)
         })
 
         test('should toggle deleted text visibility', () => {
