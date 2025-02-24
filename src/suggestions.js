@@ -1,18 +1,6 @@
 import { Plugin, PluginKey } from "prosemirror-state"
-import { ChangesetTracker } from "./changesetTracker.js"
-import { ChangesetDecorator } from "./changesetDecorator.js"
 
 export const suggestionsPluginKey = new PluginKey("suggestions")
-
-// Create instances
-const tracker = new ChangesetTracker()
-const decorator = new ChangesetDecorator()
-
-// Initialize tracker session
-tracker.startSession({
-    user: 'Anonymous',
-    timestamp: Date.now()
-})
 
 // Create the suggestions plugin
 // Default tooltip renderer that can be overridden
@@ -46,62 +34,47 @@ export const suggestionsPlugin = new Plugin({
         if (!pluginState.suggestionMode) return null
 
         // Only process relevant transactions
-        const relevant = transactions.some(tr => 
-            tr.docChanged || tr.selectionSet || tr.storedMarksSet
-        )
-        if (!relevant) return null
+        if (!transactions.some(tr => tr.docChanged)) return null
 
         let tr = newState.tr
 
-        // Compare old and new doc to find changes
-        const changes = []
-        newState.doc.descendants((node, pos) => {
-            const oldNode = oldState.doc.nodeAt(pos)
-            if (!oldNode || node.text !== oldNode.text) {
-                changes.push({
-                    from: pos,
-                    to: pos + (node.text?.length || 0),
-                    type: 'insertion'
-                })
-            }
-        })
-
-        // Handle deletions by comparing old doc positions
-        oldState.doc.descendants((node, pos) => {
-            const newNode = newState.doc.nodeAt(pos)
-            if (!newNode) {
-                changes.push({
-                    from: pos,
-                    to: pos + (node.text?.length || 0),
-                    type: 'deletion',
-                    text: node.text
-                })
-            }
-        })
-
-        // Apply marks for each change
-        changes.forEach(change => {
-            if (change.type === 'insertion') {
-                tr = tr.addMark(
-                    change.from,
-                    change.to,
-                    newState.schema.marks.suggestion_add.create({
-                        username: pluginState.username,
-                        timestamp: Date.now()
+        // Handle each transaction
+        transactions.forEach(transaction => {
+            transaction.steps.forEach((step, index) => {
+                // Get step mapping
+                const map = transaction.mapping.maps[index]
+                
+                if (step.slice && step.slice.content.size) {
+                    // This is an insertion
+                    map.forEach((oldStart, oldEnd, newStart, newEnd) => {
+                        tr = tr.addMark(
+                            newStart,
+                            newEnd,
+                            newState.schema.marks.suggestion_add.create({
+                                username: pluginState.username,
+                                timestamp: Date.now()
+                            })
+                        )
                     })
-                )
-            } else if (change.type === 'deletion') {
-                // Create a deletion widget at the position
-                const deletionMark = newState.schema.marks.suggestion_delete.create({
-                    username: pluginState.username,
-                    timestamp: Date.now(),
-                    deletedText: change.text
-                })
-                tr = tr.addMark(change.from, change.from + 1, deletionMark)
-            }
+                } else if (step.from !== undefined && step.to !== undefined) {
+                    // This is a deletion
+                    const deletedContent = oldState.doc.textBetween(step.from, step.to)
+                    if (deletedContent) {
+                        tr = tr.addMark(
+                            step.from,
+                            step.from + 1,
+                            newState.schema.marks.suggestion_delete.create({
+                                username: pluginState.username,
+                                timestamp: Date.now(),
+                                deletedText: deletedContent
+                            })
+                        )
+                    }
+                }
+            })
         })
 
-        return tr
+        return tr.steps.length ? tr : null
     },
 
     state: {
@@ -132,52 +105,34 @@ export const suggestionsPlugin = new Plugin({
     },
 
     props: {
-        decorations(state) {
-            const pluginState = this.getState(state)
-            decorator.setShowDeletedText(pluginState.showDeletedText)
-            return decorator.createDecorations(state.doc, tracker.changeset)
-        },
-
         handleKeyDown(view, event) {
             const state = this.getState(view.state)
             if (!state.suggestionMode) return false
 
-            // Let all key events be handled normally - changes will be tracked by appendTransaction
-            return false
-        },
-
-        handleTextInput(view, from, to, text) {
-            const state = this.getState(view.state)
-            if (!state.suggestionMode) return false
-
-            // Let the change happen normally - it will be tracked by appendTransaction
-            return false
-        },
-
-        // todo - delete as it does nothing
-        handleDOMEvents: {
-            beforeinput: (view, event) => {
-                console.log('beforeinput event:', {
-                    inputType: event.inputType,
-                    data: event.data,
-                    targetRange: event.getTargetRanges(),
-                    selection: view.state.selection
-                });
-                if (event.inputType === "deleteContentForward" 
-                    || event.inputType === "deleteContentBackward") {
-                    // Intercept the delete of a selected range here
-                    console.log('beforeinput event:', {
-                        inputType: event.inputType,
-                        data: event.data,
-                        targetRange: event.getTargetRanges(),
-                        selection: view.state.selection
-                    });
-                    // If you handle it, prevent ProseMirror's default by returning true
+            // Handle deletion specially
+            if (event.key === 'Backspace' || event.key === 'Delete') {
+                const { from, to } = view.state.selection
+                if (from !== to) {
+                    // There is a selection to delete
+                    const tr = view.state.tr
+                    const deletedContent = view.state.doc.textBetween(from, to)
+                    
+                    // Add deletion mark
+                    tr.addMark(
+                        from,
+                        from + 1,
+                        view.state.schema.marks.suggestion_delete.create({
+                            username: state.username,
+                            timestamp: Date.now(),
+                            deletedText: deletedContent
+                        })
+                    )
+                    
+                    view.dispatch(tr)
                     return true
                 }
-
-                return false // Let ProseMirror handle other beforeinput events
             }
+            return false
         }
     }
 })
