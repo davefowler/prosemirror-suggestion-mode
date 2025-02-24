@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test": "NODE_OPTIONS='--experimental-vm-modules --experimental-import-meta-resolve' jest",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules --experimental-import-meta-resolve' jest --watch",
     "start": "webpack serve --mode development",
     "build": "webpack --mode production"
   },
