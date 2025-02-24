@@ -30,7 +30,16 @@ window.addEventListener("load", () => {
             history(),
             keymap(baseKeymap),
             suggestionsPlugin
-        ]
+        ],
+
+        // Initialize the suggestions state
+        suggestions: {
+            suggestionMode: true,
+            showDeletedText: true,
+            // you can put any meta data you need here
+            // This data can be used to display info or trigger actions on changes
+            metaData: { user: 'Anonymous', timestamp: Date.now() }
+        }
     })
 
     // Create the editor view
@@ -47,26 +56,23 @@ window.addEventListener("load", () => {
             
             const toggleCheckbox = document.querySelector("#toggleSuggestionMode")
             toggleCheckbox.checked = suggestionState.suggestionMode
-
-            // Update deletion marks based on showDeletedText setting
-            document.querySelectorAll('.suggestion-delete').forEach(el => {
-                el.classList.toggle('compact', !suggestionState.showDeletedText)
-                el.classList.toggle('expanded', suggestionState.showDeletedText)
-            })
         }
     })
 
     // Add event listeners for the controls
     document.querySelector("#toggleSuggestionMode").addEventListener("change", (e) => {
+        console.log('Checkbox changed:', e.target.checked); // Debugging log
         const state = suggestionsPluginKey.getState(view.state)
+        console.log('Current suggestionMode state:', state.suggestionMode); // Debugging log
         view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
+            ...state,
             suggestionMode: e.target.checked,
-            username: state.username
         }))
     })
 
     document.querySelector("#showDeletedText").addEventListener("change", (e) => {
         const state = suggestionsPluginKey.getState(view.state)
+        console.log('changing showDeletedText to', e.target.checked)
         view.dispatch(view.state.tr.setMeta(suggestionsPlugin, {
             ...state,
             showDeletedText: e.target.checked

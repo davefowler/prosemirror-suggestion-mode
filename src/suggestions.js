@@ -22,8 +22,38 @@ function injectStyles() {
             text-decoration-style: solid;
             text-decoration-thickness: 2px;
         }
+        .suggestion-delete-hover {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff3333;
+            color: white;
+        }
     `
     document.head.appendChild(style)
+}
+
+
+// Insertion inline decoration
+function createInsertionDecoration(change) {
+    return Decoration.inline(change.fromB, change.toB, { class: 'suggestion-add' });
+}
+
+// Deletion widget decoration
+function createDeletionDecoration(change, originalDoc, showDeletedText) {
+    // needs the original doc to get the deleted text using fromA and toA
+    const deletedText = originalDoc.textBetween(change.fromA, change.toA, '', '\n')
+    return Decoration.widget(change.fromB, () => {
+        const container = document.createElement('span');
+        container.className = 'suggestion-delete';
+        container.setAttribute('data-deleted-text', deletedText)
+        if (showDeletedText) {
+            console.log('showDeletedText is true', change)
+            container.textContent = deletedText
+        }
+        return container;
+    });
 }
 
 export const suggestionsPlugin = new Plugin({
@@ -35,36 +65,37 @@ export const suggestionsPlugin = new Plugin({
     },
 
     state: {
-        init(_, { doc }) {
+        init(_, { doc, suggestions = { suggestionMode: false, showDeletedText: false, metaData: { user: 'Anonymous', timestamp: Date.now() } } }) {
             return {
                 changeSet: ChangeSet.create(doc),
-                suggestionMode: true,
-                username: 'Anonymous',
-                showDeletedText: true,
-                metadata: {
-                    user: 'Anonymous',
-                    timestamp: Date.now()
-                }
+                suggestionMode: suggestions.suggestionMode,
+                showDeletedText: suggestions.showDeletedText,
+                metadata: suggestions.metaData
             }
         },
         
         apply(tr, value, oldState, newState) {
-            if (!tr.docChanged) return value
+            const meta = tr.getMeta(suggestionsPlugin);
+            const showDeletedText = meta && meta.showDeletedText !== undefined ? meta.showDeletedText : value.showDeletedText;
+            const suggestionMode = meta && meta.suggestionMode !== undefined ? meta.suggestionMode : value.suggestionMode;
 
-            const stepMaps = tr.steps.map(step => step.getMap())
-            const data = { user: value.username, timestamp: Date.now() }
+            if (!tr.docChanged || !suggestionMode) return { ...value, showDeletedText, suggestionMode };
 
-            const updatedChangeSet = value.changeSet.addSteps(newState.doc, stepMaps, data)
-
+            const stepMaps = tr.steps.map(step => step.getMap());
+            const data = { user: value.username, timestamp: Date.now() };
+            const updatedChangeSet = value.changeSet.addSteps(newState.doc, stepMaps, data);
+            
             updatedChangeSet.changes.forEach(change => {
-                const changeType = change.fromA === change.toA ? 'Insertion' : 'Deletion'
-                console.log(`${changeType} detected:`, change)
-            })
+                const changeType = change.fromA === change.toA ? 'Insertion' : 'Deletion';
+                console.log(`${changeType} detected:`, change);
+            });
 
             return {
                 ...value,
-                changeSet: updatedChangeSet
-            }
+                changeSet: updatedChangeSet,
+                showDeletedText,
+                suggestionMode
+            };
         }
     },
 
@@ -77,16 +108,11 @@ export const suggestionsPlugin = new Plugin({
             changeSet.changes.forEach(change => {
                 if (change.fromA === change.toA) {
                     // Insertion
-                    decorations.push(Decoration.inline(change.fromB, change.toB, { class: 'suggestion-add' }))
+                    decorations.push(createInsertionDecoration(change))
                 } else {
                     // Deletion
-                    if (showDeletedText) {
-                        // Map the positions from the old document to the new document
-                        const from = state.tr.mapping.map(change.fromA)
-                        const to = state.tr.mapping.map(change.toA)
-                        console.log('Mapped positions:', { from, to }, 'changed from', change)
-                        decorations.push(Decoration.inline(from, to, { class: 'suggestion-delete' }))
-                    }
+                    console.log('change.deleted', change.deleted, change, showDeletedText)
+                    decorations.push(createDeletionDecoration(change, changeSet.startDoc, showDeletedText ))
                 }
             })
 
