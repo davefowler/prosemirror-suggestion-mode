@@ -6,67 +6,66 @@ export class ChangesetDecorator {
     }
 
     createDecorations(doc, changeset) {
+        if (!changeset || !changeset.changes) return DecorationSet.empty
+
         const decos = []
+        const changes = Array.isArray(changeset.changes) ? changeset.changes : []
 
-        // Process each change in the changeset
-        if (!changeset) return DecorationSet.empty
-
-        // Get changes from the changeset
-        const changes = changeset.getChanges ? changeset.getChanges() : []
-        for (const change of changes) {
-            if (change.type === 'insertion') {
-                // Add insertion decoration
-                decos.push(Decoration.inline(change.from, change.to, {
-                    class: 'suggestion-add'
-                }))
-
-                // Add tooltip
-                decos.push(this.createTooltip(change))
+        changes.forEach(change => {
+            const metadata = {
+                user: changeset.metadata?.user || 'Anonymous',
+                timestamp: changeset.metadata?.timestamp || Date.now()
             }
-            else if (change.type === 'deletion') {
+
+            if (change.inserted) {
+                // Handle insertions
+                decos.push(Decoration.inline(change.from, change.to, {
+                    class: 'suggestion-add',
+                    metadata
+                }))
+            } else if (change.deleted) {
+                // Handle deletions
                 if (this.showDeletedText) {
-                    // Show deleted text with strikethrough
-                    decos.push(Decoration.inline(change.from, change.to, {
-                        class: 'suggestion-delete expanded'
+                    decos.push(Decoration.inline(change.from, change.from + 1, {
+                        class: 'suggestion-delete expanded',
+                        'data-deleted-text': change.deleted,
+                        metadata
                     }))
                 } else {
-                    // Show compact deletion marker
                     decos.push(Decoration.widget(change.from, () => {
                         const marker = document.createElement('span')
                         marker.className = 'deletion-marker'
-                        
-                        const tooltip = document.createElement('span')
-                        tooltip.className = 'deletion-tooltip'
-                        tooltip.textContent = change.slice.content.textBetween(0, change.slice.content.size, " ")
-                        
-                        marker.appendChild(tooltip)
+                        marker.setAttribute('data-deleted-text', change.deleted)
                         return marker
-                    }, {
-                        key: `deletion-marker-${change.from}`,
-                        side: 1
+                    }, { 
+                        metadata,
+                        side: 1 
                     }))
                 }
-
-                // Add tooltip
-                decos.push(this.createTooltip(change))
             }
-        }
+
+            // Add tooltips for both types
+            decos.push(this.createTooltip(change, metadata))
+        })
 
         return DecorationSet.create(doc, decos)
     }
 
-    createTooltip(change) {
-        return Decoration.widget(change.from, () => {
+    createTooltip(change, metadata) {
+        const pos = change.from
+        return Decoration.widget(pos, () => {
             const tooltip = document.createElement('div')
             tooltip.className = 'suggestion-tooltip'
             
-            const date = new Date(change.metadata.timestamp).toLocaleDateString()
-            tooltip.textContent = `${change.type === 'deletion' ? 'Deleted' : 'Added'} by ${change.metadata.user} on ${date}`
+            const date = new Date(metadata.timestamp).toLocaleDateString()
+            const type = change.deleted ? 'Deleted' : 'Added'
+            tooltip.textContent = `${type} by ${metadata.user} on ${date}`
             
             return tooltip
         }, {
-            key: `tooltip-${change.from}`,
-            side: -1
+            key: `tooltip-${pos}`,
+            side: -1,
+            metadata
         })
     }
 
