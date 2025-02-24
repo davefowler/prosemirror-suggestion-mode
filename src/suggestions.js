@@ -1,6 +1,6 @@
 import { Plugin, PluginKey } from "prosemirror-state"
-import { ChangesetTracker } from "./changesetTracker"
-import { ChangesetDecorator } from "./changesetDecorator"
+import { ChangesetTracker } from "./changesetTracker.js"
+import { ChangesetDecorator } from "./changesetDecorator.js"
 
 export const suggestionsPluginKey = new PluginKey("suggestions")
 
