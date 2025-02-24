@@ -9,9 +9,9 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules --experimental-import-meta-resolve' jest",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules --experimental-import-meta-resolve' jest --watch",
     "start": "webpack serve --mode development",
-    "build": "npx tsc && webpack --mode production",
-    "type-check": "npx tsc --noEmit",
-    "prebuild": "npx tsc"
+    "build": "webpack --mode production",
+    "type-check": "tsc --noEmit",
+    "prebuild": "tsc"
   },
   "dependencies": {
     "prosemirror-changeset": "^2.2.1",
@@ -32,7 +32,6 @@
     "@types/jest": "^29.5.0",
     "@types/prosemirror-changeset": "^2.1.1",
     "@types/prosemirror-commands": "^1.0.4",
-    "@types/prosemirror-history": "^1.3.1",
     "@types/prosemirror-keymap": "^1.0.4",
     "@types/prosemirror-model": "^1.16.2",
     "@types/prosemirror-schema-basic": "^1.0.2",
