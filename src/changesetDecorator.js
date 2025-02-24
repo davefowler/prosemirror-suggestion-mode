@@ -37,7 +37,9 @@ export class ChangesetDecorator {
                             'data-deleted-text': change.deleted
                         }
                     }, metadata))
-                    }))
+                    
+                    // Add tooltip for expanded deletion
+                    decos.push(this.createTooltip(change, metadata))
                 } else {
                     decos.push(Decoration.widget(change.from, () => {
                         const marker = document.createElement('span')
@@ -48,11 +50,14 @@ export class ChangesetDecorator {
                         metadata,
                         side: 1 
                     }))
+                    
+                    // Add tooltip for compact deletion
+                    decos.push(this.createTooltip(change, metadata))
                 }
+            } else if (change.inserted) {
+                // Add tooltip for insertion
+                decos.push(this.createTooltip(change, metadata))
             }
-
-            // Add tooltips for both types
-            decos.push(this.createTooltip(change, metadata))
         })
 
         return DecorationSet.create(doc, decos)
