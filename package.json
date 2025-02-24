@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "ProseMirror extension for suggestion/track changes mode",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "start": "webpack serve --mode development",
     "build": "webpack --mode production"
   },
