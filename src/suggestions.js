@@ -8,6 +8,12 @@ export const suggestionsPluginKey = new PluginKey("suggestions")
 const tracker = new ChangesetTracker()
 const decorator = new ChangesetDecorator()
 
+// Initialize tracker session
+tracker.startSession({
+    user: 'Anonymous',
+    timestamp: Date.now()
+})
+
 // Create the suggestions plugin
 // Default tooltip renderer that can be overridden
 const defaultTooltipRenderer = (mark, type) => {

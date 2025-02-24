@@ -12,7 +12,7 @@ const changesetConfig = {
 
 export class ChangesetTracker {
   constructor() {
-    this.changeset = new ChangeSet()
+    this.changeset = ChangeSet.empty
     this.currentSession = null
   }
 
