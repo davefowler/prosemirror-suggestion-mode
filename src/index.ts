@@ -6,7 +6,6 @@ import { baseKeymap } from "prosemirror-commands"
 import { keymap } from "prosemirror-keymap"
 import { history } from "prosemirror-history"
 import { suggestionsPlugin, suggestionsPluginKey, SuggestionsPluginState, SuggestionsMeta, ChangeMetadata } from "./suggestions"
-import { schema } from "./schema"
 
 // Export all components for library usage
 export { schema } from './schema';

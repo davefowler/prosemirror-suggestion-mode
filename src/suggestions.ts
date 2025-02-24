@@ -1,6 +1,6 @@
 import { Plugin, PluginKey, Transaction, EditorState } from "prosemirror-state"
 import { ChangeSet, Change } from "prosemirror-changeset"
-import { Decoration, DecorationSet, EditorView } from "prosemirror-view"
+import { Decoration, DecorationSet } from "prosemirror-view"
 import { Node } from "prosemirror-model"
 
 export interface SuggestionsMeta {
