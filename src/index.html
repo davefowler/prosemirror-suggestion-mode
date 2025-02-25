@@ -12,10 +12,9 @@
             text-align: center;
         }
         .ProseMirror {
-           white-space: pre-wrap;
+            white-space: pre-wrap;
            text-align: left;
-        }
-        .editor {
+
             background: white;
             padding: 20px;
             border: 1px solid #ccc;
@@ -32,144 +31,22 @@
             gap: 10px;
             align-items: center;
         }
-        .suggestion-add {
+
+        /* Override the default styles for suggestions */
+        /* .editor .suggestion-add {
             background-color: #e6ffe6;
             border-radius: 2px;
             border-bottom: 2px solid #00cc00;
         }
-        .suggestion-delete {
+        .editor .suggestion-delete {
             position: relative;
             cursor: pointer;
             background-color: #ffcccc;
             text-decoration: line-through;
             text-decoration-color: red;
             border-radius: 2px;
-        }
+        } */
 
-        .suggestion-delete::after {
-            content: attr(data-deleted-text);
-            position: absolute;
-            display: none;
-            top: -24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            color: #666;
-            z-index: 1000;
-        }
-
-        .suggestion-delete:hover::after {
-            display: block;
-        }
-        /* When compact (showDeletedText is false) */
-        .suggestion-delete.compact {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: #ffcccc;
-            border-radius: 2px;
-
-            /* hide only the text nothing else */
-            text-indent: -9999px;
-            overflow: hidden;
-            white-space: nowrap;
-
-        }
-  
-
-        /* Tooltip styles */
-        .suggestion-tooltip-wrapper {
-            position: relative;
-            display: inline;
-        }
-
-        .suggestion-tooltip {
-            visibility: hidden;
-            position: absolute;
-            z-index: 1000;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 6px 10px;
-            background: #333;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .suggestion-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: #333;
-        }
-
-        .suggestion-add:hover .suggestion-tooltip,
-        .suggestion-delete:hover .suggestion-tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-        #modeIndicator {
-            color: #666;
-            font-size: 14px;
-        }
-
-       
-
-        /* Deletion marker styles */
-        .deletion-marker {
-            position: relative;
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: #ff4444;
-            border-radius: 2px;
-            cursor: pointer;
-            vertical-align: middle;
-        }
-
-        /* Deletion tooltip styles */
-        .deletion-tooltip {
-            visibility: hidden;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 4px 8px;
-            background: #ffcccc;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-            margin-bottom: 4px;
-            
-        }
-
-        .deletion-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: #ffcccc;
-        }
-
-        .deletion-marker:hover .deletion-tooltip {
-            visibility: visible;
-        }
     </style>
 </head>
 <body>
