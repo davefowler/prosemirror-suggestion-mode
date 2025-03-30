@@ -1,16 +1,16 @@
 // Export all public API components
 
 // Plugin core
-export { suggestionModePlugin } from './plugin.js';
-export type { SuggestionModePluginOptions } from './plugin.js';
-export { suggestionPluginKey, suggestionTransactionKey } from './key.js';
-export type { SuggestionModePluginState } from './key.js';
+export { suggestionModePlugin } from './plugin';
+export type { SuggestionModePluginOptions } from './plugin';
+export { suggestionPluginKey, suggestionTransactionKey } from './key';
+export type { SuggestionModePluginState } from './key';
 
-export * from './commands/accept-reject.js';
-export * from './commands/setMode.js';
-export * from './commands/applySuggestion.js';
-export * from './menus/hoverMenu.js';
-export { getSuggestionMenuItems } from './menus/menuBar.js';
+export * from './commands/accept-reject';
+export * from './commands/setMode';
+export * from './commands/applySuggestion';
+export * from './menus/hoverMenu';
+export { getSuggestionMenuItems } from './menus/menuBar';
 
 // Schema
-export { addSuggestionMarks } from './schema.js';
+export { addSuggestionMarks } from './schema';
