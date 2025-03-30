@@ -3,6 +3,11 @@
 <head>
     <meta charset="utf-8">
     <title>ProseMirror Suggestions Demo</title>
+
+    <!-- Importmap here simplifies need for bundler in this repo.  if you have a bundler you don't need this. -->
+    <script src="../imports.js"></script>
+    <link rel="stylesheet" href="/style/suggestion-mode.css">
+
     <style>
         body {
             line-height: 1.5;
@@ -60,7 +65,7 @@
         </p>
 
     </div>
-    <script src="simple.js"></script>
+    <script type="module" src="simple.js"></script>
 
 </body>
 </html>
