@@ -8,15 +8,14 @@ import {
   rejectAllSuggestions,
   setSuggestionMode,
 } from 'prosemirror-suggestion-mode';
-import { addSuggestionMarks } from 'prosemirror-suggestion-mode/schema';
+import { addSuggestionMarks } from 'prosemirror-suggestion-mode';
 import { DOMParser } from 'prosemirror-model';
 import { schema } from 'prosemirror-schema-basic';
 import { addListNodes } from 'prosemirror-schema-list';
 import { Schema } from 'prosemirror-model';
 
 // Import a theme for the suggestions or create your own
-import 'prosemirror-suggestion-mode/styles/default.css';
-import 'prosemirror-suggestion-mode/styles/default.css';
+import 'prosemirror-suggestion-mode/style/suggestion-mode.css';
 
 const exampleSchema = new Schema({
   nodes: addListNodes(schema.spec.nodes, 'paragraph block*', 'block'),

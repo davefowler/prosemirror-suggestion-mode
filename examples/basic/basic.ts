@@ -15,7 +15,7 @@ import { exampleSetup, buildMenuItems } from 'prosemirror-example-setup';
 import 'prosemirror-view/style/prosemirror.css';
 import 'prosemirror-menu/style/menu.css';
 import 'prosemirror-example-setup/style/style.css';
-import 'prosemirror-suggestion-mode/styles/default.css';
+import 'prosemirror-suggestion-mode/style/suggestion-mode.css';
 
 // Create an enhanced schema with suggestion marks and list support
 const mySchema = new Schema({

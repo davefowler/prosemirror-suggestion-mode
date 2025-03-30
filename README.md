@@ -219,10 +219,10 @@ You can customize the content and appearance of suggestion hover menu by either 
 
 #### CSS Styling
 
-For basic styling you can simply import the [default styles](https://github.com/davefowler/prosemirror-suggestion-mode/blob/main/src/styles/default.css)
+For basic styling you can simply import the [default styles](https://github.com/davefowler/prosemirror-suggestion-mode/blob/main/style/suggestion-mode.css)
 
 ```javascript
-import 'prosemirror-suggestion-mode/styles/default.css';
+import 'prosemirror-suggestion-mode/style/suggestion-mode.css';
 ```
 
 The hover menu customizations give you full control over the hover menu content, while CSS customization lets you style the hover menu appearance.

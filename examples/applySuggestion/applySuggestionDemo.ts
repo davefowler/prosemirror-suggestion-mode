@@ -25,7 +25,7 @@ const exampleSchema = new Schema({
 });
 
 // Normally you can just direct import a theme
-import 'prosemirror-suggestion-mode/styles/default.css';
+import 'prosemirror-suggestion-mode/style/suggestion-mode.css';
 
 // Create a custom component for displaying suggestion reason in the hover menu
 const createSuggestionReasonComponent = (
@@ -151,5 +151,5 @@ window.addEventListener('load', () => {
   const suggestionsDiv = document.querySelector('#suggestions');
 
   // Use a pre element to preserve formatting
-  suggestionsDiv.innerHTML = `<pre>${JSON.stringify(exampleSuggestions, null, 2)}</pre>`;
+  suggestionsDiv!.innerHTML = `<pre>${JSON.stringify(exampleSuggestions, null, 2)}</pre>`;
 });

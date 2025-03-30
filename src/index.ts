@@ -13,4 +13,4 @@ export * from './menus/hoverMenu';
 export { getSuggestionMenuItems } from './menus/menuBar';
 
 // Schema
-export { addSuggestionMarks } from './schema';
+export { addSuggestionMarks, suggestionMarks } from './schema';

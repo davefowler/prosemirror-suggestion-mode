@@ -1,6 +1,6 @@
 {
   "name": "prosemirror-suggestion-mode",
-  "version": "1.0.65",
+  "version": "1.0.66",
   "description": "ProseMirror extension for suggestion/track changes mode",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -10,15 +10,26 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./styles/*": "./styles/*",
-    "./schema": {
-      "import": "./dist/schema.js",
-      "require": "./dist/schema.cjs"
-    }
+    "./style/suggestion-mode.css": "./style/suggestion-mode.css"
   },
-  "files": [
-    "dist",
-    "styles"
+  "sideEffects": ["./style/suggestion-mode.css"],
+  "maintainers": [
+    {
+      "name": "Dave Fowler",
+      "email": "davefowler@gmail.com",
+      "web": "https://thingsilearned.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/davefowler/prosemirror-suggestion-mode.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "prosemirror",
+    "extension",
+    "suggestion",
+    "track changes"
   ],
   "scripts": {
     "test": "jest",
@@ -66,5 +77,9 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "files": [
+    "dist",
+    "style"
+  ]
 }
