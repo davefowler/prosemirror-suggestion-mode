@@ -1,14 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "declaration": true,
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "lib": ["dom", "esnext"]
+    "target": "es2015",
+    "module": "commonjs",
+    "lib": ["dom", "es2015"],
+    "strict": true,
+    "esModuleInterop": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
-}
+  "include": ["src/**/*", "test/**/*"]
+} 

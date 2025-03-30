@@ -1,10 +1,13 @@
 {
   "name": "prosemirror-suggestion-mode",
-  "version": "1.0.66",
-  "description": "ProseMirror extension for suggestion/track changes mode",
-  "main": "dist/index.cjs",
+  "version": "0.1.0",
+  "description": "Track changes and suggestions for ProseMirror",
+  "type": "module",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "style": "style/suggestion-mode.css",
+  "license": "MIT",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -12,74 +15,29 @@
     },
     "./style/suggestion-mode.css": "./style/suggestion-mode.css"
   },
-  "sideEffects": ["./style/suggestion-mode.css"],
-  "maintainers": [
-    {
-      "name": "Dave Fowler",
-      "email": "davefowler@gmail.com",
-      "web": "https://thingsilearned.com"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/davefowler/prosemirror-suggestion-mode.git"
-  },
-  "license": "MIT",
-  "keywords": [
-    "prosemirror",
-    "extension",
-    "suggestion",
-    "track changes"
-  ],
-  "scripts": {
-    "test": "jest",
-    "dev": "pm-buildhelper src/index.ts --watch",
-    "build": "pm-buildhelper src/index.ts",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test"
-  },
-  "peerDependencies": {
-    "prosemirror-model": "^1.0.0",
-    "prosemirror-state": "^1.0.0",
-    "prosemirror-transform": "^1.0.0",
-    "prosemirror-view": "^1.0.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.26.9",
-    "@babel/preset-env": "^7.26.9",
-    "@babel/preset-typescript": "^7.26.0",
-    "@prosemirror/buildhelper": "^0.1.8",
-    "@types/jest": "^29.5.12",
-    "babel-jest": "^29.7.0",
-    "ist": "^1.1.1",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "netlify-cli": "^17.38.1",
-    "prettier": "^3.5.3",
-    "prosemirror-commands": "^1.7.0",
-    "prosemirror-example-setup": "^1.2.3",
-    "prosemirror-history": "^1.4.1",
-    "prosemirror-keymap": "^1.2.2",
-    "prosemirror-menu": "^1.2.4",
-    "prosemirror-model": "^1.19.3",
-    "prosemirror-schema-basic": "^1.2.3",
-    "prosemirror-schema-list": "^1.5.0",
-    "prosemirror-state": "^1.4.3",
-    "prosemirror-test-builder": "^1.0.0",
-    "prosemirror-transform": "^1.7.3",
-    "prosemirror-view": "^1.31.7",
-    "ts-jest": "^29.1.2",
-    "typescript": "^5.7.3"
-  },
-  "optionalDependencies": {
-    "prosemirror-menu": "^1.2.4"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "type": "module",
   "files": [
     "dist",
     "style"
-  ]
+  ],
+  "devDependencies": {
+    "@prosemirror/buildhelper": "^0.1.8",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.7.3",
+    "prosemirror-view": "^1.31.7",
+    "prosemirror-menu": "^1.2.2",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4"
+  },
+  "scripts": {
+    "build": "pm-buildhelper src/index.ts",
+    "watch": "pm-buildhelper src/index.ts --watch",
+    "prepare": "npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  }
 }
