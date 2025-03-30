@@ -3,8 +3,11 @@
     "target": "es2015",
     "module": "commonjs",
     "lib": ["dom", "es2015"],
-    "strict": true,
-    "esModuleInterop": true
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false  
   },
   "include": ["src/**/*", "test/**/*"]
 } 

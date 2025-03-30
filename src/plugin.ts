@@ -6,6 +6,7 @@ import {
   ReplaceAroundStep,
   Transform,
   Mapping,
+  Step,
 } from 'prosemirror-transform';
 import {
   SuggestionModePluginState,
@@ -22,6 +23,7 @@ import { initSuggestionHoverListeners } from './menus/hoverHandlers';
 import { findNonStartingPos } from './helpers/nodePosition';
 
 type AnyStep = ReplaceStep | AddMarkStep | RemoveMarkStep | ReplaceAroundStep;
+
 // Plugin options interface
 export interface SuggestionModePluginOptions {
   inSuggestionMode?: boolean; // starting status of suggestion mode
