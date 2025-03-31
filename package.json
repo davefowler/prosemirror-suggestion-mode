@@ -1,6 +1,6 @@
 {
   "name": "prosemirror-suggestion-mode",
-  "version": "1.0.74",
+  "version": "1.0.75",
   "description": "Track user changes and suggestions for ProseMirror similar to Google Docs suggestions mode",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -27,34 +27,36 @@
     "style"
   ],
   "devDependencies": {
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
     "@prosemirror/buildhelper": "^0.1.8",
     "@types/jest": "^29.5.0",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
-    "prosemirror-test-builder": "^1.0.0",
-    "ts-jest": "^29.1.0",
-    "@babel/core": "^7.21.4",
-    "@babel/preset-env": "^7.21.4",
-    "@babel/preset-typescript": "^7.21.4",
-    "prosemirror-state": "^1.4.3",
-    "prosemirror-transform": "^1.7.3",
-    "prosemirror-view": "^1.31.7",
+    "nodemon": "^3.1.9",
+    "prosemirror-keymap": "^1.2.2",
     "prosemirror-menu": "^1.2.2",
     "prosemirror-model": "^1.19.3",
-    "prosemirror-keymap": "^1.2.2",
-    "prosemirror-schema-basic": "^1.2.2"
+    "prosemirror-schema-basic": "^1.2.2",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-test-builder": "^1.0.0",
+    "prosemirror-transform": "^1.7.3",
+    "prosemirror-view": "^1.31.7",
+    "ts-jest": "^29.1.0"
   },
   "scripts": {
     "prepare": "pm-buildhelper src/index.ts",
+    "watch": "nodemon --watch src -e ts --exec 'npm run prepare'",
     "test": "jest",
     "prepublishOnly": "npm test"
   },
   "peerDependencies": {
-    "prosemirror-state": "^1.4.3",
-    "prosemirror-transform": "^1.7.3",
-    "prosemirror-view": "^1.31.7",
+    "prosemirror-keymap": "^1.2.2",
     "prosemirror-menu": "^1.2.2",
     "prosemirror-model": "^1.19.3",
-    "prosemirror-keymap": "^1.2.2"
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.7.3",
+    "prosemirror-view": "^1.31.7"
   }
 }

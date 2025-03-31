@@ -6,7 +6,6 @@ import {
   ReplaceAroundStep,
   Transform,
   Mapping,
-  Step,
 } from 'prosemirror-transform';
 import {
   SuggestionModePluginState,
@@ -91,6 +90,12 @@ export const suggestionModePlugin = (
           ...transactionMeta,
           data: mergedData,
         };
+        console.log(
+          'skiping?',
+          meta.skipSuggestionOperation,
+          'inSuggestionMode?',
+          meta.inSuggestionMode
+        );
         // If we're not in suggestion mode do nothing
         if (!meta.inSuggestionMode) return;
         // if this is a transaction that we created in this plugin, ignore it
@@ -130,17 +135,19 @@ export const suggestionModePlugin = (
           // Check if we're inside an existing suggestion mark
           const $pos = intermediateTr.doc.resolve(step.from);
           const marksAtPos = $pos.marks();
-          const suggestionMark = marksAtPos.find(
+          const existingSuggestionMark = marksAtPos.find(
             (m) =>
               m.type.name === 'suggestion_insert' ||
               m.type.name === 'suggestion_delete'
           );
           let from = step.from;
-          if (suggestionMark) {
+          console.log('existingSuggestionMark', existingSuggestionMark);
+          if (existingSuggestionMark) {
+            console.log('slice size', addedSliceSize);
             if (addedSliceSize > 1) {
               // a paste has happened in the middle of a suggestion mark
               // make sure it has the same mark as the surrounding text
-              tr.addMark(from, from + addedSliceSize, suggestionMark);
+              tr.addMark(from, from + addedSliceSize, existingSuggestionMark);
               changed = true;
             }
             // We are already inside a suggestion mark so we don't need to do anything
