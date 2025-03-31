@@ -6,7 +6,7 @@ A ProseMirror plugin that implements a "suggestion mode" method to track and sho
 
 ## Demo
 
-Check out the [live demos](https://prosemirror-suggestion-mode.netlify.app)
+Check out the [live demos](https://prosemirror-suggestion-mode.netlify.app). The source for the examples is hosted at [prosemirror-suggestion-mode-examples](https://github.com/davefowler/prosemirror-suggestion-mode-examples/)
 
 - [Simple](https://prosemirror-suggestion-mode.netlify.app/examples/simple/) - a bare bones example
 - [Basic Markdown](https://prosemirror-suggestion-mode.netlify.app/examples/basic/) - use with the prosemirror-example-setup handling formatted text
@@ -215,7 +215,6 @@ The `data` attribute can contain any JSON-serializable object. This data will be
 ### Customizing the Hover Menu
 
 You can customize the content and appearance of suggestion hover menu by either overwritting a component of the default hover menu, or by providing your own full hover menu renderer.
-
 
 #### CSS Styling
 
