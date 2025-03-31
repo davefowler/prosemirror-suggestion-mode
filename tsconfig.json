@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2015",
     "module": "esnext",
+    "moduleResolution": "node",
     "lib": ["dom", "es2015"],
     "declaration": true,
     "outDir": "./dist",
@@ -9,7 +10,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "types": ["jest", "node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test/**/*"]

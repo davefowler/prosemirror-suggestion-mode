@@ -47,6 +47,17 @@ const testApplySuggestion = (
 };
 
 describe('applySuggestion tool tests', () => {
+  let originalConsoleWarn: typeof console.warn;
+
+  beforeEach(() => {
+    originalConsoleWarn = console.warn;
+    console.warn = jest.fn();
+  });
+
+  afterEach(() => {
+    console.warn = originalConsoleWarn;
+  });
+
   test('transaction after applySuggestion should not be inSuggestionMode', () => {
     const d = doc(p('hello there'));
     const view = testApplySuggestion(
