@@ -131,13 +131,6 @@ export const suggestionModePlugin = (
           if (isReplaceAroundStep(step)) {
             addedSliceSize = step.gapTo - step.gapFrom + step.slice.size;
           }
-          console.log(
-            'addedSliceSize',
-            addedSliceSize,
-            'is replaceStep?',
-            isReplaceStep(step),
-            step
-          );
           // Mark our next transactions as an internal suggestion operation so it won't be intercepted again
           tr.setMeta(suggestionTransactionKey, {
             skipSuggestionOperation: true,
@@ -152,9 +145,7 @@ export const suggestionModePlugin = (
               m.type.name === 'suggestion_delete'
           );
           let from = step.from;
-          console.log('existingSuggestionMark', existingSuggestionMark);
           if (existingSuggestionMark) {
-            console.log('slice size', addedSliceSize);
             if (addedSliceSize > 1) {
               // a paste has happened in the middle of a suggestion mark
               // make sure it has the same mark as the surrounding text
@@ -164,7 +155,6 @@ export const suggestionModePlugin = (
             // We are already inside a suggestion mark so we don't need to do anything
             return;
           }
-          console.log('removedSlice', removedSlice);
           if (removedSlice.size > 0) {
             // DELETE - content was removed.
             // We need to put it back and add a suggestion_delete mark on it
@@ -221,13 +211,10 @@ export const suggestionModePlugin = (
                 extraChars += 1;
               });
 
-              // console.log('last child', removedSlice.content.lastChild);
               const endsWithText =
                 removedSlice.content.lastChild?.textContent.length > 0;
-              // console.log('has text at end?', endsWithText);
               if (removedSlice.openEnd > 0 && !endsWithText) {
                 // if the last open node is empty, add a zero width space to be marked
-                // console.log('adding zero width space');
                 tr.insertText('\u200B', from + currentPos + extraChars);
                 extraChars += 1;
               }
@@ -262,21 +249,13 @@ export const suggestionModePlugin = (
             changed = true;
           }
 
-          console.log('addedSliceSize', addedSliceSize, from);
           if (addedSliceSize > 0) {
             // ReplaceAroundStep has an insert property that is the number of extra characters inserted
             // for things like numbers in a list item
 
             const addedFrom = from + removedSlice.size;
             const addedTo = addedFrom + addedSliceSize + extraInsertChars;
-            console.log(
-              'addedFrom',
-              addedFrom,
-              'addedTo',
-              addedTo,
-              addedSliceSize,
-              extraInsertChars
-            );
+
             // just mark it, it was already inserted before appendTransaction
             tr.addMark(
               addedFrom,
