@@ -5,10 +5,11 @@
 - handle overlapping suggestions from multiple users
 - applySuggestion only works for text matching - a more advanced way would be great.
 
-## 1.0.62
+## 1.0.76
 - supports esm modules
 - inserts with no matching strings now trim before checking doc text length
 - fixed a lot of import usage issues with package
+- uses pm-buildhelper for consistency with other pm packages
 
 ## 1.0.38
 

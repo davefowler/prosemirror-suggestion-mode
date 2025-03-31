@@ -1,6 +1,6 @@
 import { Command, EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { suggestionPluginKey } from '../key';
+import { suggestionPluginKey } from './key';
 import { Transaction } from 'prosemirror-state';
 
 /**

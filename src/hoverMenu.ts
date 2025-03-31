@@ -1,7 +1,7 @@
 import {
   acceptSuggestionsInRange,
   rejectSuggestionsInRange,
-} from '../commands/accept-reject';
+} from './acceptReject';
 import { Command } from 'prosemirror-state';
 
 // Menu item interface

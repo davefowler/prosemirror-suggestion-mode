@@ -1,5 +1,5 @@
 import { EditorView } from 'prosemirror-view';
-import { suggestionTransactionKey } from '../key';
+import { suggestionTransactionKey } from './key';
 import { Node } from 'prosemirror-model';
 import { Command, EditorState, Transaction } from 'prosemirror-state';
 

@@ -5,12 +5,9 @@
  */
 import { MenuItem } from 'prosemirror-menu';
 import { EditorState } from 'prosemirror-state';
-import {
-  acceptAllSuggestions,
-  rejectAllSuggestions,
-  toggleSuggestionMode,
-} from '../';
-import { suggestionPluginKey } from '../key';
+import { acceptAllSuggestions, rejectAllSuggestions } from './acceptReject';
+import { toggleSuggestionMode } from './setMode';
+import { suggestionPluginKey } from './key';
 
 const hasSuggestions = (state: EditorState): boolean => {
   let found = false;

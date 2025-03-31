@@ -1,25 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "es2015",
-    "moduleResolution": "bundler",
-    "baseUrl": ".",
-    "rootDir": ".",
-    "paths": {
-      "prosemirror-suggestion-mode": ["./src"],
-      "prosemirror-suggestion-mode/*": ["./src/*"]
-    },
+    "target": "es2015",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["dom", "es2015"],
     "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": false,
-    "noImplicitAny": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
     "sourceMap": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "preserveSymlinks": true,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
     "types": ["jest", "node"]
   },
-  "include": ["src/**/*", "examples/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test/**/*"]
 }

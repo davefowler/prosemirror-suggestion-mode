@@ -1,5 +1,5 @@
 import { Mark } from 'prosemirror-model';
-import { suggestionTransactionKey } from '../key';
+import { suggestionTransactionKey } from './key';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { Command } from 'prosemirror-state';
 

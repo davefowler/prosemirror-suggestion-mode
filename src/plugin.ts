@@ -16,12 +16,22 @@ import {
   SuggestionHoverMenuRenderer,
   hoverMenuFactory,
   SuggestionHoverMenuOptions,
-} from './menus/hoverMenu';
+} from './hoverMenu';
 import { createDecorations } from './decorations';
-import { initSuggestionHoverListeners } from './menus/hoverHandlers';
+import { initSuggestionHoverListeners } from './hoverHandlers';
 import { findNonStartingPos } from './helpers/nodePosition';
 
 type AnyStep = ReplaceStep | AddMarkStep | RemoveMarkStep | ReplaceAroundStep;
+
+// Type guard functions for each step type
+function isReplaceStep(step: AnyStep): step is ReplaceStep {
+  return step.constructor.name === 'ReplaceStep';
+}
+
+function isReplaceAroundStep(step: AnyStep): step is ReplaceAroundStep {
+  return step.constructor.name === 'ReplaceAroundStep';
+}
+
 // Plugin options interface
 export interface SuggestionModePluginOptions {
   inSuggestionMode?: boolean; // starting status of suggestion mode
@@ -113,11 +123,12 @@ export const suggestionModePlugin = (
 
           // we don't actually use/need the addedSlice, we just need its size to mark it
           // in all but the ReplaceStep, the removedSlice is the same size as the addedSlice
-          let addedSliceSize =
-            step instanceof ReplaceStep ? step.slice.size : removedSlice.size;
+          let addedSliceSize = isReplaceStep(step)
+            ? step.slice.size
+            : removedSlice.size;
           let extraInsertChars = 0;
-          if (step instanceof ReplaceAroundStep) {
-            // TODO this extrainsertchars is wrong
+
+          if (isReplaceAroundStep(step)) {
             addedSliceSize = step.gapTo - step.gapFrom + step.slice.size;
           }
           // Mark our next transactions as an internal suggestion operation so it won't be intercepted again
@@ -128,30 +139,31 @@ export const suggestionModePlugin = (
           // Check if we're inside an existing suggestion mark
           const $pos = intermediateTr.doc.resolve(step.from);
           const marksAtPos = $pos.marks();
-          const suggestionMark = marksAtPos.find(
+          const existingSuggestionMark = marksAtPos.find(
             (m) =>
               m.type.name === 'suggestion_insert' ||
               m.type.name === 'suggestion_delete'
           );
           let from = step.from;
-          if (suggestionMark) {
+          console.log('existingSuggestionMark', existingSuggestionMark);
+          if (existingSuggestionMark) {
+            console.log('slice size', addedSliceSize);
             if (addedSliceSize > 1) {
               // a paste has happened in the middle of a suggestion mark
               // make sure it has the same mark as the surrounding text
-              tr.addMark(from, from + addedSliceSize, suggestionMark);
+              tr.addMark(from, from + addedSliceSize, existingSuggestionMark);
               changed = true;
             }
             // We are already inside a suggestion mark so we don't need to do anything
             return;
           }
-
+          console.log('removedSlice', removedSlice);
           if (removedSlice.size > 0) {
             // DELETE - content was removed.
             // We need to put it back and add a suggestion_delete mark on it
 
             const isBackspace =
-              (step instanceof ReplaceStep ||
-                step instanceof ReplaceAroundStep) &&
+              (isReplaceStep(step) || isReplaceAroundStep(step)) &&
               step.slice.size === 0 &&
               newState.selection.from === step.from;
 
@@ -243,12 +255,21 @@ export const suggestionModePlugin = (
             changed = true;
           }
 
+          console.log('addedSliceSize', addedSliceSize, from);
           if (addedSliceSize > 0) {
             // ReplaceAroundStep has an insert property that is the number of extra characters inserted
             // for things like numbers in a list item
 
             const addedFrom = from + removedSlice.size;
             const addedTo = addedFrom + addedSliceSize + extraInsertChars;
+            console.log(
+              'addedFrom',
+              addedFrom,
+              'addedTo',
+              addedTo,
+              addedSliceSize,
+              extraInsertChars
+            );
             // just mark it, it was already inserted before appendTransaction
             tr.addMark(
               addedFrom,

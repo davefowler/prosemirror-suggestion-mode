@@ -1,9 +1,0 @@
-[build]
-  publish = "dist"
-  command = "npm run build:examples"
-
-[dev]
-  command = "npm start"
-  port = 8080
-  publish = "dist"
-  framework = "#custom"

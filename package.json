@@ -1,76 +1,62 @@
 {
   "name": "prosemirror-suggestion-mode",
-  "version": "1.0.63",
-  "description": "ProseMirror extension for suggestion/track changes mode",
-  "main": "./dist/index.js",
+  "version": "1.0.76",
+  "description": "Track user changes and suggestions for ProseMirror similar to Google Docs suggestions mode",
+  "type": "module",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "dist/index.d.ts",
+  "style": "style/suggestion-mode.css",
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Dave Fowler",
+      "email": "davefowler@gmail.com",
+      "url": "https://thingsilearned.com"
+    }
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style/suggestion-mode.css": "./style/suggestion-mode.css"
+  },
   "files": [
     "dist",
-    "styles"
+    "style"
   ],
-  "scripts": {
-    "test": "jest",
-    "start": "webpack serve --mode development",
-    "dev": "webpack serve --mode development",
-    "build": "webpack --mode production && tsc -p tsconfig.lib.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test"
-  },
-  "peerDependencies": {
-    "prosemirror-model": "^1.0.0",
-    "prosemirror-state": "^1.0.0",
-    "prosemirror-transform": "^1.0.0",
-    "prosemirror-view": "^1.0.0"
-  },
   "devDependencies": {
-    "@babel/core": "^7.26.9",
-    "@babel/preset-env": "^7.26.9",
-    "@babel/preset-typescript": "^7.26.0",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
     "@prosemirror/buildhelper": "^0.1.8",
-    "@types/jest": "^29.5.12",
-    "babel-jest": "^29.7.0",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-loader": "^7.1.2",
-    "ist": "^1.1.1",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "netlify-cli": "^17.38.1",
-    "prettier": "^3.5.3",
-    "prosemirror-commands": "^1.7.0",
-    "prosemirror-example-setup": "^1.2.3",
-    "prosemirror-history": "^1.4.1",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "nodemon": "^3.1.9",
     "prosemirror-keymap": "^1.2.2",
-    "prosemirror-menu": "^1.2.4",
+    "prosemirror-menu": "^1.2.2",
     "prosemirror-model": "^1.19.3",
-    "prosemirror-schema-basic": "^1.2.3",
-    "prosemirror-schema-list": "^1.5.0",
+    "prosemirror-schema-basic": "^1.2.2",
     "prosemirror-state": "^1.4.3",
     "prosemirror-test-builder": "^1.0.0",
     "prosemirror-transform": "^1.7.3",
     "prosemirror-view": "^1.31.7",
-    "style-loader": "^4.0.0",
-    "ts-jest": "^29.1.2",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.7.3",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "ts-jest": "^29.1.0"
   },
-  "optionalDependencies": {
-    "prosemirror-menu": "^1.2.4"
+  "scripts": {
+    "prepare": "pm-buildhelper src/index.ts",
+    "watch": "nodemon --watch src -e ts --exec 'npm run prepare'",
+    "test": "jest",
+    "prepublishOnly": "npm test"
   },
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "type": "module",
-  "exports": {
-    ".": "./dist/index.js",
-    "./styles/*": "./dist/styles/*",
-    "./schema": "./dist/schema.js"
-  },
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "esModuleInterop": true
+  "peerDependencies": {
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-menu": "^1.2.2",
+    "prosemirror-model": "^1.19.3",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.7.3",
+    "prosemirror-view": "^1.31.7"
   }
 }

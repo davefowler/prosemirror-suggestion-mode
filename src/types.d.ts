@@ -58,7 +58,7 @@ declare module 'prosemirror-suggestion-mode/schema' {
   export * from './schema';
 }
 
-declare module 'prosemirror-suggestion-mode/styles/default.css' {
+declare module 'prosemirror-suggestion-mode/style/suggestion-mode.css' {
   const content: any;
   export default content;
 }
