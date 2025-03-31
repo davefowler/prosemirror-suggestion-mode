@@ -25,11 +25,11 @@ type AnyStep = ReplaceStep | AddMarkStep | RemoveMarkStep | ReplaceAroundStep;
 
 // Type guard functions for each step type
 function isReplaceStep(step: AnyStep): step is ReplaceStep {
-  return step.constructor.name === 'ReplaceStep';
+  return 'slice' in step && !('gapFrom' in step);
 }
 
 function isReplaceAroundStep(step: AnyStep): step is ReplaceAroundStep {
-  return step.constructor.name === 'ReplaceAroundStep';
+  return 'slice' in step && 'gapFrom' in step && 'gapTo' in step;
 }
 
 // Plugin options interface
@@ -131,6 +131,13 @@ export const suggestionModePlugin = (
           if (isReplaceAroundStep(step)) {
             addedSliceSize = step.gapTo - step.gapFrom + step.slice.size;
           }
+          console.log(
+            'addedSliceSize',
+            addedSliceSize,
+            'is replaceStep?',
+            isReplaceStep(step),
+            step
+          );
           // Mark our next transactions as an internal suggestion operation so it won't be intercepted again
           tr.setMeta(suggestionTransactionKey, {
             skipSuggestionOperation: true,
