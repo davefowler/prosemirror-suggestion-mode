@@ -1,6 +1,6 @@
 {
   "name": "prosemirror-suggestion-mode",
-  "version": "1.0.75",
+  "version": "1.0.76",
   "description": "Track user changes and suggestions for ProseMirror similar to Google Docs suggestions mode",
   "type": "module",
   "main": "./dist/index.cjs",
