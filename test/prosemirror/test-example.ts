@@ -41,6 +41,19 @@ describe('Basic suggestion edit tests', () => {
     );
   });
 
+  it('should add a suggestion mark on a single character', () => {
+    const d1 = doc(p('hello <a>'));
+    const d2 = doc(p('hello ', sadd('w')));
+    testSuggestionTransform(
+      d1,
+      d2,
+      (tr) => {
+        tr.insert(tr.doc.tag.a, schema.text('w'));
+      },
+      true
+    );
+  });
+
   it('should not add a suggestion mark if suggestion mode is off', () => {
     const d1 = doc(p('hello <a>'));
     const d2 = doc(p('hello world'));
