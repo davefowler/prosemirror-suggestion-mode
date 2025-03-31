@@ -1,10 +1,10 @@
 {
   "name": "prosemirror-suggestion-mode",
-  "version": "1.0.71",
+  "version": "1.0.74",
   "description": "Track user changes and suggestions for ProseMirror similar to Google Docs suggestions mode",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "dist/index.d.ts",
   "style": "style/suggestion-mode.css",
   "license": "MIT",
@@ -16,11 +16,8 @@
     }
   ],
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./style/suggestion-mode.css": "./style/suggestion-mode.css"
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "files": [
     "dist",
@@ -45,11 +42,9 @@
     "prosemirror-schema-basic": "^1.2.2"
   },
   "scripts": {
-    "build": "pm-buildhelper src/index.ts",
-    "prepare": "npm run build",
+    "prepare": "pm-buildhelper src/index.ts",
     "test": "jest",
-    "prepublishOnly": "npm test",
-    "dev": "npm run build & npm run start"
+    "prepublishOnly": "npm test"
   },
   "peerDependencies": {
     "prosemirror-state": "^1.4.3",

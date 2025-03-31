@@ -17,9 +17,9 @@ import {
   SuggestionHoverMenuRenderer,
   hoverMenuFactory,
   SuggestionHoverMenuOptions,
-} from './menus/hoverMenu';
+} from './hoverMenu';
 import { createDecorations } from './decorations';
-import { initSuggestionHoverListeners } from './menus/hoverHandlers';
+import { initSuggestionHoverListeners } from './hoverHandlers';
 import { findNonStartingPos } from './helpers/nodePosition';
 
 type AnyStep = ReplaceStep | AddMarkStep | RemoveMarkStep | ReplaceAroundStep;

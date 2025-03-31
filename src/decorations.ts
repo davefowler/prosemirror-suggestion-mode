@@ -1,6 +1,6 @@
 import { EditorState } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-import { SuggestionHoverMenuRenderer } from './menus/hoverMenu';
+import { SuggestionHoverMenuRenderer } from './hoverMenu';
 
 /**
  * Decorates a group of suggestions with a hover menu

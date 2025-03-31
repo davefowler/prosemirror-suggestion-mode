@@ -6,11 +6,16 @@ export type { SuggestionModePluginOptions } from './plugin';
 export { suggestionPluginKey, suggestionTransactionKey } from './key';
 export type { SuggestionModePluginState } from './key';
 
-export * from './commands/accept-reject';
-export * from './commands/setMode';
-export * from './commands/applySuggestion';
-export * from './menus/hoverMenu';
-export { getSuggestionMenuItems } from './menus/menuBar';
+export {
+  acceptSuggestionsInRange,
+  rejectSuggestionsInRange,
+  acceptAllSuggestions,
+  rejectAllSuggestions,
+} from './acceptReject';
+export * from './setMode';
+export * from './applySuggestion';
+export * from './hoverMenu';
+export { getSuggestionMenuItems } from './menuBar';
 
 // Schema
 export { addSuggestionMarks, suggestionMarks } from './schema';

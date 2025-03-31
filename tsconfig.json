@@ -6,9 +6,12 @@
     "lib": ["dom", "es2015"],
     "declaration": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "sourceMap": true,
+    "preserveSymlinks": true,
     "noImplicitAny": false,
     "strictPropertyInitialization": false,
     "types": ["jest", "node"]
