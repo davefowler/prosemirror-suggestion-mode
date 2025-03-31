@@ -8,11 +8,11 @@ A ProseMirror plugin that implements a "suggestion mode" method to track and sho
 
 Check out the [live demos](https://prosemirror-suggestion-mode.netlify.app). The source for the examples is hosted at [prosemirror-suggestion-mode-examples](https://github.com/davefowler/prosemirror-suggestion-mode-examples/)
 
-- [Simple](https://prosemirror-suggestion-mode.netlify.app/examples/simple/) - a bare bones example
-- [Basic Markdown](https://prosemirror-suggestion-mode.netlify.app/examples/basic/) - use with the prosemirror-example-setup handling formatted text
-- [Apply Suggestion Method](https://prosemirror-suggestion-mode.netlify.app/examples/applySuggestion/) - showcasing the applySuggestion method for applying text based suggestions (handy for AI)
+- [Simple](https://prosemirror-suggestion-mode.netlify.app/simple/) - a bare bones example
+- [Basic Markdown](https://prosemirror-suggestion-mode.netlify.app/basic/) - use with the prosemirror-example-setup handling formatted text
+- [Apply Suggestion Method](https://prosemirror-suggestion-mode.netlify.app/applySuggestion/) - showcasing the applySuggestion method for applying text based suggestions (handy for AI)
 
-[![ProseMirror Suggestion Mode Demo](https://github.com/davefowler/prosemirror-suggestion-mode/blob/main/assets/3-11-25%20prosemirror%20suggestions%20with%20markup.png)](https://prosemirror-suggestion-mode.netlify.app/examples/basic/)
+[![ProseMirror Suggestion Mode Demo](https://github.com/davefowler/prosemirror-suggestion-mode/blob/main/assets/3-11-25%20prosemirror%20suggestions%20with%20markup.png)](https://prosemirror-suggestion-mode.netlify.app/basic/)
 
 ## Features
 
