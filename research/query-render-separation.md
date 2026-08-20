@@ -14,6 +14,8 @@
 
 **Effort:** with the queue/pool system already in place and a query-result cache already existing, the MVP is roughly **1–2 engineer-weeks**, plus 1–2 more for dedup, observability, and rollout hardening. The single biggest feasibility risk is whether the compile stage can enumerate *all* of a render's queries up front without actually rendering — if queries are discovered lazily mid-render, add a week+ to build a query-manifest pass. **[verify]**
 
+**The extreme version — native async warehouse APIs (§6) — is less extreme than it sounds.** It's a v2 of the query pool's internals, not a different architecture: the job submits to the warehouse's own job API, persists the handle, and releases the worker; a poller completes it later. The big five warehouses all have first-class job APIs (BigQuery is *natively* job-based), and Airflow's deferrable operators are large-scale prior art for exactly this pattern. Its main prize is reliability and unbounded in-flight scale rather than compute — phase 1 already captures most of the compute win — so build phase 1 with a driver interface that leaves room for it, then add async adapters warehouse-by-warehouse.
+
 ---
 
 ## 1. Current vs. proposed
@@ -146,7 +148,59 @@ None of these is a stop-sign; they're the standard costs of this pattern, and ev
 
 ---
 
-## 6. Effort estimate
+## 6. The extreme version: native async warehouse drivers
+
+Phase 1 still has *someone* waiting on each query — a cheap query worker holding a driver connection. The extreme version removes even that: submit the query through the warehouse's own asynchronous job API, persist the job handle, release the worker entirely, and let a small poller complete the job when the warehouse says it's done.
+
+### It's the same architecture, one layer deeper
+
+Nothing about §4 changes — compile, fan-out, barrier, cache, render trigger are all identical. Only the query job's internals change, from a blocking call to a small state machine:
+
+```
+SUBMITTED ──▶ POLLING ──▶ FETCHING ──▶ CACHED ──▶ (decrement barrier)
+     └──────────── error / timeout ────────▶ FAILED
+```
+
+The job runs in three short worker touches (submit ~100ms, poll checks ~10ms each, fetch) instead of one long-held slot. This is exactly the design worth *interfacing for* in phase 1 even if it ships later: give the driver layer `execute()` plus an optional `submit()/status()/fetch()` trio, and warehouses gain the async path one adapter at a time while everything else keeps the phase-1 held-worker path.
+
+### The warehouse job APIs actually exist and are mature
+
+Your nervousness — "not many people use those APIs" — is the right instinct to check, but the landscape is better than its reputation:
+
+| Warehouse | Async mechanism | Maturity / notes |
+|---|---|---|
+| BigQuery | `jobs.insert` → `jobs.get` → `getQueryResults` | **Natively job-based** — this *is* the primary API; the "sync" client is a wrapper around it |
+| Snowflake | `execute_async()` in official connectors; SQL REST API with statement handles | Official, documented; results retrievable by query ID after disconnect; used by Airflow deferrable operators |
+| Redshift | Data API (`ExecuteStatement`/`DescribeStatement`/`GetStatementResult`) | Built for exactly this; the standard path for serverless/Lambda integrations. 100MB result cap via the API **[verify against result sizes]** |
+| Databricks | SQL Statement Execution API, async disposition + external links (results via presigned cloud-storage URLs) | Solid since ~2023; external links neatly solve large results |
+| Athena | `StartQueryExecution` → poll → results in S3 | Natively async, nothing else offered |
+| Trino/Presto | Protocol is poll-based (`nextUri`) by design | Async-shaped already |
+| Postgres / MySQL / ClickHouse / DuckDB | **No job API** — a connection must stay open | Keep the phase-1 held-worker path as the permanent fallback lane |
+
+The strongest de-risking precedent: **Airflow's deferrable operators** run this exact pattern at scale — submit to the warehouse, free the worker, a lightweight "triggerer" polls thousands of handles — against Snowflake, BigQuery, Databricks, and Redshift. dbt Cloud and most modern orchestrators lean on the same job APIs. You would not be the first production user of any of these.
+
+### What it buys beyond phase 1
+
+Be honest about the compute math: phase 1 already moved the waiting onto cheap workers, so the *incremental compute* saving here is modest. The real prizes are different:
+
+- **Crash and deploy safety.** The job handle is persisted, so a query worker dying or being deployed mid-query loses nothing — the poller picks the handle back up. With sync drivers, every deploy of the query pool kills or orphans every in-flight query. For minutes-long warehouse queries this is the difference between "deploy anytime" and "drain first."
+- **Unbounded in-flight concurrency.** Workers scale with submission/poll *throughput*, not with the number of queries currently running. Thousands of in-flight queries on a couple of tiny processes; no connection-pool exhaustion from long queries.
+- **Free query lifecycle features.** Job APIs expose cancellation, progress, and queue position naturally — "cancel this render's queries" becomes an API call instead of a connection kill.
+
+### The real costs
+
+- **Per-warehouse adapters instead of one driver interface.** Each warehouse needs its own submit/poll/fetch implementation with its own auth, error taxonomy, and type mapping. Budget ~3–5 days each for the big five, cheapest first (BigQuery, Athena, Redshift Data API), plus ~1 week for a shared poller with jittered backoff and rate-limit awareness.
+- **Feature parity gaps vs. drivers.** REST/job APIs sometimes lag drivers on auth modes, session/role parameters, multi-statement, parameter binding, and type fidelity (JSON transports flatten types). Each adapter needs a conformance test suite against the real warehouse. This — not obscurity — is where the "few people do this" pain actually lives.
+- **Result transport differences.** Partitioned results (Snowflake), S3-only results (Athena), presigned links (Databricks), size caps (Redshift Data API) each need handling in the fetch step before results land in the cache.
+- **A fallback lane is mandatory anyway** for connection-bound databases, so the codebase permanently carries both modes — which the phase-1 interface gives you for free.
+
+### Verdict on the extreme version
+
+Right instinct, wrong sequencing risk only. Don't build it *first* — phase 1 captures most of the compute savings with one generic implementation. But design the phase-1 driver interface with the `submit/status/fetch` shape in mind, then add async adapters in order of warehouse usage share. Each adapter is a small, independently shippable project, and by the second one the poller infrastructure is amortized.
+
+---
+
+## 7. Effort estimate
 
 Assumes the queue/pool infra and a query-result cache already exist, and the compiler can enumerate a render's queries up front. **[verify all three]**
 
@@ -159,9 +213,13 @@ Assumes the queue/pool infra and a query-result cache already exist, and the com
 
 **Add ~1 week+** if query discovery is lazy and a manifest-extraction pass has to be built. **Add time** if interactive delivery needs new SSE/WebSocket plumbing rather than an existing channel.
 
+| Later phase | Work | Estimate |
+|---|---|---|
+| 4. Async drivers (§6) | shared job-poller service + submit/status/fetch adapter per warehouse | ~1 week poller + 3–5 days per warehouse, ship one at a time |
+
 ---
 
-## 7. Verification checklist (run against `fivetran/dataface`)
+## 8. Verification checklist (run against `fivetran/dataface`)
 
 1. Does the compile stage produce the complete query list for a render *before* rendering, or are queries discovered during render?
 2. Are there query-on-query dependencies (results templated into later queries)?
@@ -172,13 +230,16 @@ Assumes the queue/pool infra and a query-result cache already exist, and the com
 7. How do clients consume renders — held HTTP response, polling, push? Is there an existing SSE/WS channel to reuse?
 8. What happens today when one query in a render fails or times out?
 9. Real numbers: P50/P95 for `T_compile`, `T_queries`, `T_render`, renders/day, and the render pool's instance cost.
+10. For §6: which warehouses carry what share of query volume (decides async-adapter order), and does the driver layer have a seam where a `submit/status/fetch` interface can slot in?
+11. Typical result-set sizes vs. the job APIs' transport limits (Redshift Data API's 100MB cap, Snowflake partitioned results).
 
 ---
 
-## 8. Recommendation
+## 9. Recommendation
 
 1. **Instrument now** (item 0) — half a day, and it converts this doc's scenario table into your actual numbers.
 2. **Answer checklist items 1–4** with a short code read — they determine whether this is the easy version (~2 weeks to MVP) or the harder one.
 3. If `T_q` dominates as expected, **build the MVP behind a flag and ship scheduled reports first** — the biggest queries, zero latency sensitivity, and a clean rollback story.
+4. **Shape the phase-1 driver interface for §6** (`execute()` now, optional `submit/status/fetch` later), then add native async adapters warehouse-by-warehouse once phase 1 is proven — starting with whichever warehouse carries the most query volume.
 
 The idea is sound, the pattern is proven, most of the infrastructure already exists, and the decision reduces to one measurable ratio. Good spike to run.
